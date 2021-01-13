@@ -20,8 +20,8 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
     const log = document.getElementById('log');
 
     port.on('hexadecimal', (value) => {
-        console.log(value);
-        log.innerText += value + '\n';
+        // console.log(value);
+        log.innerText = JSON.stringify(value) + '\n';
     });
 
     document.getElementById('red').addEventListener('input', updateLed)
@@ -34,8 +34,9 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
         const b = document.getElementById('blue').value
 
         // const rgb = r + ',' + g + ',' + b + '\n';
-        const rgb = { r, g, b }
-        await port.write("values", rgb);
+        let rgb = { r, g, b }
+        // console.log(rgb);
+        await port.send("values", rgb);
     }
 </script>
 
