@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plain - Control Background Color with Arduino</title>
+</head>
+<body>
+<button onclick="connect()">Connect to Serial Port</button>
+<br><br>
+<pre id="log"></pre>
+<script type="text/javascript">
+    const connection = new MyLibrary({
+        element: "#permissionElement",
+        baudRate: 9600
+    })
+
+    // The library handles events in familiar JS fashion, letting developers
+    // concentrate on writing code.
+    connection.on('backgroundColor', (brightness) => {
+        document.body.style.backgroundColor = 'hsl(255, 0%, ' + brightness + '%)';
+    });
+</script>
+
+</body>
+</html>

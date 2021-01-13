@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plain - Control LED with button</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="notSupported">serial api not supported</div>
+Hello there
+<button onclick="connect()">Connect to Serial Port</button>
+<br><br>
+<button onclick="toggleLED()">Toggle LED</button>
+<pre id="log"></pre>
+<script type="text/javascript">
+    let port;
+    let toggle = false;
+    const log = document.getElementById('log');
+    async function connect() {
+        console.log('connect called');
+        port = await navigator.serial.requestPort();
+        await port.open({
+            baudRate: 9600
+        })
+        let decoder = new TextDecoderStream();
+
+
+        const inputDone = port.readable.pipeTo(decoder.writable);
+        const inputStream = decoder.readable;
+
+        const reader = inputStream.getReader();
+        await readLoop(reader);
+
+
+
+    }
+
+    async function toggleLED() {
+        const writer = port.writable.getWriter();
+        const byte = (toggle = !toggle) ? 0 : 1
+        console.log("toggilng LED: " + byte);
+        const data = new Uint8Array([byte]); // 1
+        await writer.write(data);
+        writer.releaseLock();
+    }
+
+    async function readLoop(reader) {
+        console.log('readLoop called');
+        while (true) {
+            const { value, done } = await reader.read();
+            if (value) {
+                log.innerText += value;
+            }
+            if (done) {
+                console.log('[readLoop] DONE', done);
+                reader.releaseLock();
+                break;
+            }
+        }
+    }
+</script>
+<script type="text/javascript">
+    const notSupported = document.getElementById('notSupported');
+    notSupported.classList.toggle('hidden', 'serial' in navigator);
+</script>
+</body>
+</html>

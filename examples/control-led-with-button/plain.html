@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plain - Control LED with button</title>
+</head>
+<body>
+<button onclick="connect()">Connect to Serial Port</button>
+<br><br>
+<button onclick="toggleLED()">Toggle LED</button>
+<script type="text/javascript">
+    let port;
+    let toggle = false;
+
+    async function connect() {
+        console.log('connect called');
+        port = await navigator.serial.requestPort();
+        await port.open({
+            baudRate: 9600
+        })
+    }
+
+    async function toggleLED() {
+        const writer = port.writable.getWriter();
+        const byte = (toggle = !toggle) ? 0 : 1
+        const data = new Uint8Array([byte]); // 1
+        await writer.write(data);
+        writer.releaseLock();
+    }
+</script>
+
+</body>
+</html>

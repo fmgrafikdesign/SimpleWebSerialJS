@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plain - Control Background Color with Arduino</title>
+</head>
+<body>
+<button onclick="connect()">Connect to Serial Port</button>
+<br><br>
+Red: <input id="red" type="range" min="0" max="255"><br>
+Green: <input id="green" type="range" min="0" max="255"><br>
+Blue: <input id="blue" type="range" min="0" max="255"><br>
+<pre id="log"></pre>
+<script type="text/javascript">
+    let port;
+    let writer;
+
+    async function connect() {
+        console.log('connect called');
+        port = await navigator.serial.requestPort();
+        await port.open({
+            baudRate: 9600
+        })
+        const textEncoder = new TextEncoderStream();
+        const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+        writer = textEncoder.writable.getWriter();
+        let decoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(decoder.writable)
+        const inputStream = decoder.readable;
+        const reader = decoder.readable
+        .pipeThrough(new TransformStream(new LineBreakTransformer()))
+        .getReader()
+        await readLoop(reader);
+    }
+
+
+    async function readLoop(reader) {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (value) {
+                console.log(value);
+                log.innerText = value;
+            }
+            if (done) {
+                console.log('[readLoop] DONE', done);
+                reader.releaseLock();
+                break;
+            }
+        }
+    }
+
+    document.getElementById('red').addEventListener('input', updateLed)
+    document.getElementById('green').addEventListener('input', updateLed)
+    document.getElementById('blue').addEventListener('input', updateLed)
+
+    async function updateLed() {
+        const r = document.getElementById('red').value
+        const g = document.getElementById('green').value
+        const b = document.getElementById('blue').value
+
+        const rgb = r + ',' + g + ',' + b + '\n';
+        await writer.write(rgb);
+    }
+
+    class LineBreakTransformer {
+        constructor() {
+            // A container for holding stream data until a new line.
+            this.chunks = "";
+        }
+
+        transform(chunk, controller) {
+            // Append new chunks to existing chunks.
+            this.chunks += chunk;
+            // For each line breaks in chunks, send the parsed lines out.
+            const lines = this.chunks.split("\r\n");
+            this.chunks = lines.pop();
+            lines.forEach((line) => controller.enqueue(line));
+        }
+
+        flush(controller) {
+            // When the stream is closed, flush any remaining chunks out.
+            controller.enqueue(this.chunks);
+        }
+    }
+</script>
+
+</body>
+</html>

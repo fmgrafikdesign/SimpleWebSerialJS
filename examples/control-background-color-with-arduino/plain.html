@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plain - Control Background Color with Arduino</title>
+</head>
+<body>
+<button onclick="connect()">Connect to Serial Port</button>
+<br><br>
+<pre id="log"></pre>
+<script type="text/javascript">
+    let port;
+    let toggle = false;
+
+    async function connect() {
+        console.log('connect called');
+        port = await navigator.serial.requestPort();
+        await port.open({
+            baudRate: 9600
+        })
+
+        let decoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(decoder.writable)
+
+        const inputStream = decoder.readable;
+
+        const reader = decoder.readable
+        .pipeThrough(new TransformStream(new LineBreakTransformer()))
+        .getReader()
+        await readLoop(reader);
+
+    }
+
+    async function readLoop(reader) {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (value) {
+                if(!isNaN(parseInt(value))) {
+                    setBackgroundColor(parseInt(value));
+                }
+            }
+            if (done) {
+                console.log('[readLoop] DONE', done);
+                reader.releaseLock();
+                break;
+            }
+        }
+    }
+
+    function setBackgroundColor (brightness) {
+        document.body.style.backgroundColor = 'hsl(255, 0%, ' + brightness + '%)';
+    }
+
+    class LineBreakTransformer {
+        constructor() {
+            // A container for holding stream data until a new line.
+            this.chunks = "";
+        }
+
+        transform(chunk, controller) {
+            // Append new chunks to existing chunks.
+            this.chunks += chunk;
+            // For each line breaks in chunks, send the parsed lines out.
+            const lines = this.chunks.split("\r\n");
+            this.chunks = lines.pop();
+            lines.forEach((line) => controller.enqueue(line));
+        }
+
+        flush(controller) {
+            // When the stream is closed, flush any remaining chunks out.
+            controller.enqueue(this.chunks);
+        }
+    }
+</script>
+
+</body>
+</html>

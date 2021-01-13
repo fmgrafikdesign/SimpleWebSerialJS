@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plain - Control Background Color with Arduino</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+</head>
+<body>
+<button onclick="connect()">Connect to Serial Port</button>
+<br><br>
+Red: <input id="red" type="range" min="0" max="255"><br>
+Green: <input id="green" type="range" min="0" max="255"><br>
+Blue: <input id="blue" type="range" min="0" max="255"><br>
+<pre id="log"></pre>
+<script type="text/javascript">
+    let port = new SimpleSerial({
+        logIncomingSerialData: true,
+        logOutgoingSerialData: false
+    });
+    const log = document.getElementById('log');
+
+    port.on('hexadecimal', (value) => {
+        console.log(value);
+        log.innerText += value + '\n';
+    });
+
+    document.getElementById('red').addEventListener('input', updateLed)
+    document.getElementById('green').addEventListener('input', updateLed)
+    document.getElementById('blue').addEventListener('input', updateLed)
+
+    async function updateLed() {
+        const r = document.getElementById('red').value
+        const g = document.getElementById('green').value
+        const b = document.getElementById('blue').value
+
+        // const rgb = r + ',' + g + ',' + b + '\n';
+        const rgb = { r, g, b }
+        await port.write("values", rgb);
+    }
+</script>
+
+</body>
+</html>
