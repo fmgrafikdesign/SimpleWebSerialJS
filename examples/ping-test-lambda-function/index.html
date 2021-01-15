@@ -9,26 +9,34 @@
             font-family: monospace;
             line-height: 2;
         }
+
+        #ping, #log {
+            display: inline;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
 <button id="ping">Ping!</button>
-<div id="log"></div>
+<div id="pingback"></div>
 <script>
+    // To save us set up time, we let the library handle requesting access to the Web Serial API
     const conn = new SimpleSerial({
         requestAccessOnPageLoad: true
     });
 
     let timestamp = null;
     // When we click on the ping button, send the event "ping" to the Arduino.
-    document.getElementById("ping").addEventListener("click", function () {
+    // We use an arrow function here as our callback, just to write a few less characters.
+    document.getElementById("ping").addEventListener("click", () => {
         timestamp = performance.now();
         conn.sendEvent("ping");
     })
 
     // When we receive the "pong" event, show how long it took.
-    conn.on("pong", function(data) {
-        document.getElementById("log").innerText = "Arduino pinged back after " + performance.now() - timestamp + "ms";
+    // Again, we write our callback as an arrow function.
+    conn.on("pong", () => {
+        document.getElementById("pingback").innerText = "Pingback arrived after ~" + Math.round((performance.now() - timestamp)) + "ms";
     })
 </script>
 </body>
