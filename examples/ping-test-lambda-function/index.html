@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Logger</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+        * {
+            font-family: monospace;
+            line-height: 2;
+        }
+    </style>
+</head>
+<body>
+<button id="ping">Ping!</button>
+<div id="log"></div>
+<script>
+    const conn = new SimpleSerial({
+        requestAccessOnPageLoad: true
+    });
+
+    let timestamp = null;
+    // When we click on the ping button, send the event "ping" to the Arduino.
+    document.getElementById("ping").addEventListener("click", function () {
+        timestamp = performance.now();
+        conn.sendEvent("ping");
+    })
+
+    // When we receive the "pong" event, show how long it took.
+    conn.on("pong", function(data) {
+        document.getElementById("log").innerText = "Arduino pinged back after " + performance.now() - timestamp + "ms";
+    })
+</script>
+</body>
+</html>

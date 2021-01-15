@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Plotter</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        #graph {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: translateX(0);
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background-color: red;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        #zero {
+            position: absolute;
+            top: calc(50% + 4px);
+            width: 100%;
+            left: 0;
+            height: 1px;
+            background-color: rgb(200, 200, 200);
+            padding-left: 5px;
+        }
+
+        #upper {
+            position: absolute;
+            top: 2vh;
+            width: 100%;
+            left: 0;
+            height: 1px;
+            background-color: rgb(200, 200, 200);
+            padding-left: 5px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="graph"></div>
+<div id="zero">0</div>
+<div id="upper">1023</div>
+<script>
+    const graph = document.getElementById("graph");
+    let frameCount = 0;
+
+    const conn = new SimpleSerial({
+        requestAccessOnPageLoad: true
+    });
+    let value = 0;
+
+    // Register callback that listens to pure, unnamed data
+    conn.on("data", function(data) {
+        value = data;
+    })
+
+    /* Graph logic */
+    // This is very wasteful compared to a canvas-based approach, but it works for illustration purposes
+    function updateGraph() {
+        frameCount++;
+        graph.setAttribute("style", "transform: translateX(-" + frameCount + "px)");
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
+        dot.setAttribute("style", "transform: translate(" + frameCount + "px, -"+value+"vh)");
+        graph.append(dot);
+        requestAnimationFrame(updateGraph);
+    }
+    requestAnimationFrame(updateGraph);
+
+</script>
+</body>
+</html>

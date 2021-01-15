@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Logger</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+        * {
+            font-family: monospace;
+            line-height: 2;
+        }
+    </style>
+</head>
+<body>
+<button id="request-access">Click to connect to Serial API</button>
+<div id="log"></div>
+<script>
+    const conn = new SimpleSerial({
+        requestButton: "request-access"
+    });
+
+    conn.on("log", function(data) {
+        document.getElementById("log").innerText = data + '\n' + document.getElementById("log").innerText;
+    })
+</script>
+</body>
+</html>

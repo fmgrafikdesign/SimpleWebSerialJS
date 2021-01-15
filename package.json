@@ -1,0 +1,28 @@
+{
+  "name": "simpleserialjs",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/SimpleSerial.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fmgrafikdesign/SimpleWebSerialJS.git"
+  },
+  "author": "Fabian Mohr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fmgrafikdesign/SimpleWebSerialJS/issues"
+  },
+  "homepage": "https://github.com/fmgrafikdesign/SimpleWebSerialJS#readme",
+  "devDependencies": {
+    "webpack": "^5.14.0"
+  }
+}

@@ -2,25 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Plain - Control Background Color with Arduino</title>
+    <title>Library - Control Background Color with Arduino</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
 </head>
 <body>
-<button onclick="connect()">Connect to Serial Port</button>
-<br><br>
 Red: <input id="red" type="range" min="0" max="255"><br>
 Green: <input id="green" type="range" min="0" max="255"><br>
 Blue: <input id="blue" type="range" min="0" max="255"><br>
 <pre id="log"></pre>
+<button id="btn">connect</button>
 <script type="text/javascript">
-    const connection = new MyLibrary({
-        element: "#permissionElement",
-        baudRate: 9600,
-    })
+    let port = new SimpleSerial();
+    const log = document.getElementById('log');
 
-    // The library handles events in familiar JS fashion, letting developers
-    // concentrate on writing code.
-    connection.on('hexadecimal', (value) => {
-        log.innerText = value;
+    port.on('hexadecimal', (value) => {
+        log.innerText = JSON.stringify(value) + '\n';
     });
 
     document.getElementById('red').addEventListener('input', updateLed)
@@ -32,8 +28,8 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
         const g = document.getElementById('green').value
         const b = document.getElementById('blue').value
 
-        // Send data as named events with arbitrary parameters
-        await connection.sendEvent("values", {r, g, b});
+        let rgb = { r, g, b }
+        await port.send("values", rgb);
     }
 </script>
 
