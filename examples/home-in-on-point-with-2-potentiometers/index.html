@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Target Game</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style type="text/css">
+        html, body {
+            background: rgb(24,24,24);
+            color: #fff;
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #vertical {
+            position: absolute;
+            width: 4px;
+            height: 100%;
+            background: white;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #horizontal {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: white;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #target {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: forestgreen;
+            transform: translate(-50%, -50%);
+        }
+
+        #text {
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            z-index: 2;
+        }
+
+        .gridpoint {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgb(32,32,32);
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+<p id="text">Use your potentiometers to locate the point on the web page!</p>
+<div id="horizontal"></div>
+<div id="vertical"></div>
+<div id="target"></div>
+<script>
+    const hor = document.getElementById("horizontal");
+    const ver = document.getElementById("vertical");
+    const target = document.getElementById("target");
+    const connection = new SimpleSerial({ requestAccessOnPageLoad: true });
+
+    /* This handles connecting the bars to serial input */
+    connection.on("v", number => hor.style.top = 2*number + "%")
+    connection.on("h", number => ver.style.left = 2*number + "%")
+
+    /* Game logic */
+    let score = 0;
+    let last = Number.MAX_SAFE_INTEGER;
+    let timestamp = performance.now();
+    let best = Number.MAX_SAFE_INTEGER;
+    let average = 0;
+    function generateTargetPoint() {
+        target.style.top = ((Math.floor(Math.random() * 47) + 3) * 2) + "%";
+        target.style.left = ((Math.floor(Math.random() * 47) + 3) * 2) + "%";
+    }
+
+    function generateGrid() {
+        for (let i = 1; i < 50; i++) {
+            for(let j = 1; j < 50; j++) {
+                const el = document.createElement("div");
+                el.classList.add("gridpoint");
+                el.style.top = i*2 + "%";
+                el.style.left = j*2 + "%";
+                document.body.append(el);
+            }
+        }
+    }
+    generateGrid();
+
+    generateTargetPoint();
+
+    function checkIfOnTargetPoint() {
+        if(hor.style.top === target.style.top && ver.style.left === target.style.left) {
+            score++;
+            const last = performance.now() - timestamp;
+            timestamp = performance.now();
+            if(last < best) {
+                best = last;
+            }
+            average -= average / score;
+            average += last / score;
+            document.getElementById("text").innerHTML ="score: " + score + "<br>best: " + (Math.round(best/100)/10) + "s<br>last: " + (Math.round(last/100)/10) + "s<br>avg.: " + (Math.round(average/100)/10) + "s" ;
+            generateTargetPoint();
+        }
+        requestAnimationFrame(checkIfOnTargetPoint);
+    }
+    requestAnimationFrame(checkIfOnTargetPoint);
+
+    setInterval(checkIfOnTargetPoint, 100);
+</script>
+</body>
+</html>
