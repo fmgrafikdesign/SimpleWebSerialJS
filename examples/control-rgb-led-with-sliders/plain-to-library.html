@@ -32,8 +32,6 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
         const b = document.getElementById('blue').value
 
         let rgb = { r, g, b }
-        // await port.sendEvent("goodone");
-        // await port.sendData(1234);
         await port.send("values", rgb);
     }
 </script>

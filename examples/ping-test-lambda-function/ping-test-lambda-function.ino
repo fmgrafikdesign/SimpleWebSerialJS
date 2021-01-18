@@ -3,6 +3,7 @@
 SimpleWebSerial WebSerial;
 
 long unsigned reset = millis();
+int counter = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -12,7 +13,8 @@ void setup() {
   // We listen for the ping event and define a callback for it.
   // This time, we use a lambda function, the equivalent to an arrow function in JavaScript.
   WebSerial.on("ping", [](JSONVar data) {
-    WebSerial.sendEvent("pong");
+    counter++;
+    WebSerial.send("pong", counter);
   });
 }
 

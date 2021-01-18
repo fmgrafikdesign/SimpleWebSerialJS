@@ -35,8 +35,9 @@
 
     // When we receive the "pong" event, show how long it took.
     // Again, we write our callback as an arrow function.
-    conn.on("pong", () => {
-        document.getElementById("pingback").innerText = "Pingback arrived after ~" + Math.round((performance.now() - timestamp)) + "ms";
+    conn.on("pong", (pingNumber) => {
+        const rounded = Math.round((performance.now() - timestamp));
+        document.getElementById("pingback").innerText = "Pingback arrived after ~" + rounded + "ms [#" + pingNumber + "]";
     })
 </script>
 </body>
