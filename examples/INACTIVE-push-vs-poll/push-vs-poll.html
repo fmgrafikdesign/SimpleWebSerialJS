@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Push vs Poll</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+    </style>
+</head>
+<body>
+<p>This example shows the difference between <em>pushing data</em> and <em>polling for data</em>. When you're pushing
+    data, i.e. by sending an event in the loop() method on the Arduino or a setInterval in your JavaScript, you're
+    sending events no matter what. Depending on the size and complexity of your program, this might end up hurting
+    performance, or even prove to be too much data for the serial connection.</p>
+<p>The alternative is polling for data. This means it is your job to tell your programs when to ask for new data, e.g.
+    after X seconds or when the user makes an interaction to request it.</p>
+<div id="log"></div>
+<script>
+    const PUSH = 0;
+    const POLL = 1;
+
+    // Our program mode for demonstration purposes. Starts in PUSH mode
+    let mode = PUSH;
+
+    // Controls an LED
+    let on = 0;
+
+    const conn = new SimpleSerial({
+        requestAccessOnPageLoad: true
+    });
+
+    /* PUSH: The web page sends */
+    let interval = setInterval(sendLEDState, 20)
+
+    function sendLEDState() {
+        conn.sendEvent("led", on);
+    }
+
+    function toggleMode() {
+        if(mode === PUSH) {
+            mode = POLL
+        } else {
+            mode = PUSH
+        }
+    }
+</script>
+</body>
+</html>

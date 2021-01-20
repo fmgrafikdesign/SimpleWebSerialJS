@@ -33,7 +33,6 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
         await readLoop(reader);
     }
 
-
     async function readLoop(reader) {
         while (true) {
             const { value, done } = await reader.read();
