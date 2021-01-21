@@ -59,9 +59,7 @@
     const graph = document.getElementById("graph");
     let frameCount = 0;
 
-    const conn = new SimpleSerial({
-        requestAccessOnPageLoad: true
-    });
+    const conn = new SimpleSerial();
     let value = 0;
 
     // Register callback that listens to pure, unnamed data
@@ -70,10 +68,10 @@
     })
 
     /* Graph logic */
-    // This is very wasteful compared to a canvas-based approach, but it works for illustration purposes
     function updateGraph() {
         frameCount++;
         graph.setAttribute("style", "transform: translateX(-" + frameCount + "px)");
+        // This is very wasteful compared to a canvas-based approach, but it works for illustration purposes
         const dot = document.createElement("div");
         dot.classList.add("dot");
         dot.setAttribute("style", "transform: translate(" + frameCount + "px, -"+value+"vh)");

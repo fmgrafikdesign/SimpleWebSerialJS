@@ -11,13 +11,9 @@ Green: <input id="green" type="range" min="0" max="255"><br>
 Blue: <input id="blue" type="range" min="0" max="255"><br>
 <pre id="log"></pre>
 <script type="text/javascript">
-    let port = new SimpleSerial({
-        requestAccessOnPageLoad: true,
-        logIncomingSerialData: false,
-    });
+    let port = new SimpleSerial();
 
     port.on('hexadecimal', (value) => {
-        // console.log('event called');
         log.innerText = JSON.stringify(value) + '\n';
     });
 

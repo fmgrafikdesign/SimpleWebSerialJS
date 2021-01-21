@@ -40,9 +40,7 @@ void setup() {
   WebSerial.on("lambda", [](JSONVar data) {
     WebSerial.send("vialambda", "some params");
   });
-  WebSerial.on("ledon", (JSONVar data) {
-  Serial.println("Function 2 called");
-});
+  WebSerial.on("ledon", function2);
 
 
   WebSerial.on("values", setLed);

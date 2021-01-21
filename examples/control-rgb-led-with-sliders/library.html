@@ -6,13 +6,15 @@
     <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
 </head>
 <body>
+<p>This example demonstrates two way data transmission: The browser sends an event to the Arduino when the value of any
+    slider changes, and the arduino sends back an event with a HEX-representation of the received values.</p>
 Red: <input id="red" type="range" min="0" max="255"><br>
 Green: <input id="green" type="range" min="0" max="255"><br>
 Blue: <input id="blue" type="range" min="0" max="255"><br>
 <pre id="log"></pre>
 <button id="btn">connect</button>
 <script type="text/javascript">
-    let port = new SimpleSerial();
+    const port = new SimpleSerial();
     const log = document.getElementById('log');
 
     port.on('hexadecimal', (value) => {
@@ -28,7 +30,7 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
         const g = document.getElementById('green').value
         const b = document.getElementById('blue').value
 
-        let rgb = { r, g, b }
+        let rgb = {r, g, b}
         await port.send("values", rgb);
     }
 </script>

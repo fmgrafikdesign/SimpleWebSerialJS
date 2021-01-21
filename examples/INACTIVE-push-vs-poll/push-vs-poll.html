@@ -25,9 +25,7 @@
     // Controls an LED
     let on = 0;
 
-    const conn = new SimpleSerial({
-        requestAccessOnPageLoad: true
-    });
+    const conn = new SimpleSerial();
 
     /* PUSH: The web page sends */
     let interval = setInterval(sendLEDState, 20)
