@@ -11,7 +11,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js"
   },
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fmgrafikdesign/SimpleWebSerialJS.git"
@@ -22,7 +21,5 @@
     "url": "https://github.com/fmgrafikdesign/SimpleWebSerialJS/issues"
   },
   "homepage": "https://github.com/fmgrafikdesign/SimpleWebSerialJS#readme",
-  "devDependencies": {
-    "webpack": "^5.14.0"
-  }
+  "devDependencies": {}
 }
