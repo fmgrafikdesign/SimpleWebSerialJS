@@ -1,5 +1,5 @@
 {
-  "name": "simpleserialjs",
+  "name": "simple-web-serial",
   "version": "0.0.1",
   "description": "",
   "main": "lib/SimpleSerial.js",
