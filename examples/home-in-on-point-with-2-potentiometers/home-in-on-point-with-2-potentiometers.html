@@ -67,7 +67,7 @@
     const hor = document.getElementById("horizontal");
     const ver = document.getElementById("vertical");
     const target = document.getElementById("target");
-    const connection = new SimpleSerial({ requestAccessOnPageLoad: true });
+    const connection = new SimpleSerial();
 
     /* This handles connecting the bars to serial input */
     connection.on("v", number => hor.style.top = 2*number + "%")
