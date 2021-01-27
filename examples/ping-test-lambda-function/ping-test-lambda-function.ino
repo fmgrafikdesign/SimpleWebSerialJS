@@ -23,7 +23,7 @@ void setup() {
  * void sendPongEvent (JSONVar data) {
  *    WebSerial.sendEvent("pong");
  * }
- * 
+ *
  */
 
 // the loop routine runs over and over again forever:
