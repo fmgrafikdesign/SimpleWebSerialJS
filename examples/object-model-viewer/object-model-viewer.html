@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object Model Viewer</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #explainer {
+            position: fixed;
+            left: 15px;
+            top: 15px;
+            color: #fff;
+            font-family: sans-serif;
+        }
+    </style>
+    <script type="module">
+        /* 3D setup with three.js */
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        const light = new THREE.PointLight( 0xEF950F, 5, 100 );
+        light.position.set( 50, 50, 50 );
+        scene.add( light );
+        const light2 = new THREE.PointLight( 0x0000ff, 1, 100 );
+        light2.position.set( -50, -50, -50 );
+        scene.add( light2 );
+
+        const geometry = new THREE.IcosahedronGeometry();
+        const material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+        const torusKnot = new THREE.Mesh( geometry, material );
+        scene.add( torusKnot );
+        const light3 = new THREE.AmbientLight( 0x4A4A64 ); // soft white light
+        scene.add( light3 );
+
+        camera.position.z = 3;
+
+        const animate = function () {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        };
+
+        // Simple Serial Setup
+        const conn = new SimpleSerial();
+
+        // r is for 'rotation'. Keeping the event name short enables us to send it more often until event indexing is implemented.
+        conn.on("r", function (rotation) {
+            // rotation is an object with the keys x, y and z for each axis of rotation respectively.
+            // They arrive from 0 to 1023, and we'll map them to radians.
+            Number.prototype.map = function (in_min, in_max, out_min, out_max) {
+                return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            }
+            torusKnot.rotation.x = (Math.PI * rotation.x.map(0, 1023, 0, 359)) / 180;
+            torusKnot.rotation.y = (Math.PI * rotation.y.map(0, 1023, 0, 359)) / 180;
+            torusKnot.rotation.z = (Math.PI * rotation.z.map(0, 1023, 0, 359)) / 180;
+        })
+
+        animate();
+    </script>
+
+<body>
+<span id="explainer">Use a gyroscope to rotate the 3D model</span>
+</body>
+</head>
+<body>
+
+</body>
+</html>
