@@ -16,7 +16,6 @@ Blue: <input id="blue" type="range" min="0" max="255"><br>
     let writer;
 
     async function connect() {
-        console.log('connect called');
         port = await navigator.serial.requestPort();
         await port.open({
             baudRate: 9600

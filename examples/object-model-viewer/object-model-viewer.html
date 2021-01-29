@@ -52,16 +52,33 @@
         // Simple Serial Setup
         const conn = new SimpleSerial();
 
+        // Small average setup to reduce sensor jittering
+        const averagex = new Array(10).fill(0);
+        const averagey = new Array(10).fill(0);
+        const average_count = 10;
+        let i = 0;
         // r is for 'rotation'. Keeping the event name short enables us to send it more often until event indexing is implemented.
         conn.on("r", function (rotation) {
-            // rotation is an object with the keys x, y and z for each axis of rotation respectively.
-            // They arrive from 0 to 1023, and we'll map them to radians.
+            // rotation is an object with the keys x and y for the x and y axis of rotation respectively.
+            // They arrive from -180 to 180, and we'll map them to radians.
             Number.prototype.map = function (in_min, in_max, out_min, out_max) {
                 return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
             }
-            torusKnot.rotation.x = (Math.PI * rotation.x.map(0, 1023, 0, 359)) / 180;
-            torusKnot.rotation.y = (Math.PI * rotation.y.map(0, 1023, 0, 359)) / 180;
-            torusKnot.rotation.z = (Math.PI * rotation.z.map(0, 1023, 0, 359)) / 180;
+            const x = (Math.PI * rotation.x.map(180, -180, 0, 359)) / 180;
+            const y = (Math.PI * rotation.y.map(180, -180, 0, 359)) / 180;
+            averagex[i] = x;
+            averagey[i] = y;
+            // Average out
+            const avgx = averagex.reduce((val, next) => val + next) / average_count;
+            const avgy = averagey.reduce((val, next) => val + next) / average_count;
+            torusKnot.rotation.x = avgx;
+            torusKnot.rotation.z = avgy;
+
+            // Loop through average array
+            i++;
+            if(i > average_count) {
+                i=0;
+            }
         })
 
         animate();
