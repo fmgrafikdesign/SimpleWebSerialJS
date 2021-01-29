@@ -4,21 +4,111 @@
     <meta charset="UTF-8">
     <title>Library - Control Background Color with Arduino</title>
     <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            font-family: sans-serif;
+            font-size: 18px;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+
+        .flex {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .wrapper {
+            padding-bottom: 40px;
+        }
+
+        /* Nice input sliders, by Brandon McConnell - https://codepen.io/brandonmcconnell/pen/oJBVQW */
+
+        input[type=range] {
+            outline: 0;
+            border: 0;
+            border-radius: 500px;
+            width: 400px;
+            max-width: 100%;
+            margin: 24px 0 16px;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            input[type=range] {
+                overflow: hidden;
+                height: 40px;
+                -webkit-appearance: none;
+                background-color: #ddd;
+            }
+            input[type=range]::-webkit-slider-runnable-track {
+                height: 40px;
+                -webkit-appearance: none;
+                color: #444;
+                -webkit-transition: box-shadow 0.2s ease-in-out;
+                transition: box-shadow 0.2s ease-in-out;
+            }
+            input[type=range]::-webkit-slider-thumb {
+                width: 40px;
+                -webkit-appearance: none;
+                height: 40px;
+                cursor: ew-resize;
+                background: #fff;
+                box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 40px #1597ff;
+                border-radius: 50%;
+                -webkit-transition: box-shadow 0.2s ease-in-out;
+                transition: box-shadow 0.2s ease-in-out;
+                position: relative;
+            }
+
+            #red::-webkit-slider-thumb {
+                box-shadow: -340px 0 0 320px #ff0000, inset 0 0 0 40px #9b0000;
+            }
+
+            #green::-webkit-slider-thumb {
+                box-shadow: -340px 0 0 320px #00ff00, inset 0 0 0 40px #008500;
+            }
+
+            #blue::-webkit-slider-thumb {
+                box-shadow: -340px 0 0 320px #0000ff, inset 0 0 0 40px #0000b8;
+            }
+            input[type=range]:active::-webkit-slider-thumb {
+                background: #fff;
+                box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 3px #1597ff;
+            }
+        }
+
+        input:not(:active) + #h4-container h4 {
+            opacity: 0;
+            margin-top: -50px;
+            pointer-events: none;
+        }
+
+    </style>
 </head>
 <body>
-<p>This example demonstrates two way data transmission: The browser sends an event to the Arduino when the value of any
-    slider changes, and the arduino sends back an event with a HEX-representation of the received values.</p>
-Red: <input id="red" type="range" min="0" max="255"><br>
-Green: <input id="green" type="range" min="0" max="255"><br>
-Blue: <input id="blue" type="range" min="0" max="255"><br>
-<pre id="log"></pre>
-<button id="btn">connect</button>
+<div class="flex">
+    <div class="wrapper">
+        <p>This example demonstrates two way data transmission: The browser sends an event to the Arduino when the value
+            of any
+            slider changes, and the arduino sends back an event with a HEX-representation of the received values.</p>
+        <input id="red" type="range" min="0" max="255"><br>
+        <input id="green" type="range" min="0" max="255"><br>
+        <input id="blue" type="range" min="0" max="255"><br>
+        <p>The LED shines in color <span id="log"></span></p>
+    </div>
+</div>
 <script type="text/javascript">
     const port = new SimpleSerial();
     const log = document.getElementById('log');
 
     port.on('hexadecimal', (value) => {
-        log.innerText = JSON.stringify(value) + '\n';
+        log.innerText = value;
     });
 
     document.getElementById('red').addEventListener('input', updateLed)
