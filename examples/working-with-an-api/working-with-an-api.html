@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Working with an API</title>
+    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            font-family: sans-serif;
+            font-weight: bold;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            text-align: center;
+            font-size: 36px;
+        }
+        .hide {
+            display: none !important;
+        }
+
+        .lds-heart {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+            transform: rotate(45deg);
+            transform-origin: 40px 40px;
+        }
+        .lds-heart div {
+            top: 32px;
+            left: 32px;
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: #fa0000;
+            animation: lds-heart 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+        .lds-heart div:after,
+        .lds-heart div:before {
+            content: " ";
+            position: absolute;
+            display: block;
+            width: 32px;
+            height: 32px;
+            background: #f30000;
+        }
+        .lds-heart div:before {
+            left: -24px;
+            border-radius: 50% 0 0 50%;
+        }
+        .lds-heart div:after {
+            top: -24px;
+            border-radius: 50% 50% 0 0;
+        }
+        @keyframes lds-heart {
+            0% {
+                transform: scale(0.95);
+            }
+            5% {
+                transform: scale(1.1);
+            }
+            39% {
+                transform: scale(0.85);
+            }
+            45% {
+                transform: scale(1);
+            }
+            60% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(0.9);
+            }
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .wrapper {
+            max-width: 800px;
+            width: 100%;
+            margin: 5vh auto 0 auto;
+        }
+
+        #cat-image {
+            max-width: 400px;
+            margin: auto;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <p id="cat-fact">For emergency cat fact press button.</p>
+    <img id="cat-image" src="" />
+    <div id="loading" class="lds-heart hide"><div></div></div>
+</div>
+<script>
+    // To save us set up time, we let the library handle requesting access to the Web Serial API
+    const conn = new SimpleSerial();
+
+    // When we receive the "cat-fact" event, call our callback function
+    // We write our callback as an asynchronous function, so we can await the API response.
+    conn.on("cat-fact", async function() {
+        // Hide our cat-fact text and show our loading spinner
+        document.getElementById("cat-fact").classList.toggle("hide");
+        document.getElementById("loading").classList.toggle("hide");
+        document.getElementById("cat-image").classList.toggle("hide")
+
+        // The api response is an object with the keys "fact" and "length". We use destructuring to get the fact key, saving us a few lines.
+        const {fact} = await (await fetch("https://catfact.ninja/fact")).json()
+        document.getElementById("cat-fact").innerText = fact;
+
+        // Get a random cat image for good measure, people love cat images
+        const {url} = (await (await fetch("https://api.thecatapi.com/v1/images/search")).json())[0]
+        document.getElementById("cat-image").src = url;
+
+        // Show our cat-fact text and image and hide our loading spinner
+        document.getElementById("cat-fact").classList.toggle("hide");
+        document.getElementById("loading").classList.toggle("hide")
+        document.getElementById("cat-image").classList.toggle("hide")
+    })
+</script>
+</body>
+</html>
