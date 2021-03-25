@@ -18,6 +18,7 @@
 <script>
     const conn = new SimpleSerial({
         requestButton: "request-access",
+        requestAccessOnPageLoad: false
     });
 
     // When we click on the reset button, send the "reset" event to the Arduino.
