@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Simple Logger</title>
-    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
     <style>
         .ping-wrapper {
             display: flex;
@@ -108,7 +108,7 @@
 </div>
 <script>
     // To save us set up time, we let the library handle requesting access to the Web Serial API
-    const conn = new SimpleSerial({
+    const conn = SimpleSerial.connect({
         requestAccessOnPageLoad: true
     });
 

@@ -2,14 +2,18 @@
   "name": "simple-web-serial",
   "version": "0.0.1",
   "description": "",
-  "main": "lib/SimpleSerial.js",
+  "main": "dist/cjs/SimpleSerial.js",
+  "module": "dist/esm/SimpleSerial.js",
+  "files": [
+    "dist"
+  ],
   "directories": {
     "example": "examples",
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.js"
+    "dev": "rollup -c -w",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -21,5 +25,14 @@
     "url": "https://github.com/fmgrafikdesign/SimpleWebSerialJS/issues"
   },
   "homepage": "https://github.com/fmgrafikdesign/SimpleWebSerialJS#readme",
-  "devDependencies": {}
+  "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-transform-runtime": "^7.13.10",
+    "@babel/preset-env": "^7.13.12",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
+    "rollup": "^2.42.4",
+    "rollup-plugin-terser": "^7.0.2"
+  }
 }

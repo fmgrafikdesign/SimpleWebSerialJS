@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Library - Control Background Color with Arduino</title>
-    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
 </head>
 <body>
 Red: <input id="red" type="range" min="0" max="255"><br>
@@ -11,7 +11,7 @@ Green: <input id="green" type="range" min="0" max="255"><br>
 Blue: <input id="blue" type="range" min="0" max="255"><br>
 <pre id="log"></pre>
 <script type="text/javascript">
-    let port = new SimpleSerial();
+    let port = SimpleSerial.connect();
 
     port.on('hexadecimal', (value) => {
         log.innerText = JSON.stringify(value) + '\n';

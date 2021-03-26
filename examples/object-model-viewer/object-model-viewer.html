@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Object Model Viewer</title>
-    <script lang="text/javascript" src="../../lib/SimpleSerial.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -50,7 +50,7 @@
         };
 
         // Simple Serial Setup
-        const conn = new SimpleSerial();
+        const conn = SimpleSerial.connect();
 
         // Small average setup to reduce sensor jittering
         const averagex = new Array(10).fill(0);
