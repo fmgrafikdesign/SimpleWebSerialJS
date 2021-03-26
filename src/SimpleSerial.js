@@ -56,260 +56,261 @@ const defaultConstructorObject = {
 }
 
 export default function connect(args) {
-    return new SimpleSerial(args)
+    return SimpleSerial(args)
 }
 
-export class SimpleSerial {
-    configuration;
-    port;
-    writer;
-    modal;
-    _listeners = {};
-    _this = this;
+const SimpleSerial = function(args) {
+    if (!navigator.serial) {
+        throw new Error("The Serial API not supported in your browser. Make sure you've enabled flags if necessary!");
+    }
 
-    constructor(args) {
-        if (!navigator.serial) {
-            throw new Error("The Serial API not supported in your browser. Make sure you've enabled flags if necessary!");
+    if (typeof args === "number") {
+        args = {
+            ...defaultConstructorObject,
+            baudRate: args
         }
+    } else if (typeof args === "undefined") {
+        args = defaultConstructorObject;
+    } else if (typeof args === 'object') {
+        // TODO check for valid configuration object (transformer, HTML Element, ...)
 
-        if (typeof args === "number") {
-            args = {
-                ...defaultConstructorObject,
-                baudRate: args
+        // constructor object, override defaults
+        args = {
+            ...defaultConstructorObject,
+            ...args
+        }
+    }
+
+    if (args.requestButton != null) {
+        args = {
+            requestAccessOnPageLoad: false,
+            ...args
+        }
+    }
+
+    let configuration = args;
+
+    const instance = {
+        configuration,
+        port: null,
+        writer: null,
+        modal: null,
+        _listeners: {},
+        _this: this,
+
+        requestSerialAccessOnClick: function(element) {
+            if (typeof element === "string") {
+                // Search for HTML Element with this id
+                const el = document.getElementById(element)
+                if (!el) throw "Could not find element with ID '" + element + "'."
+                element = el;
             }
-        } else if (typeof args === "undefined") {
-            args = defaultConstructorObject;
-        } else if (typeof args === 'object') {
-            // TODO check for valid configuration object (transformer, HTML Element, ...)
+            element.addEventListener("click", instance.connect)
+        },
 
-            // constructor object, override defaults
-            args = {
-                ...defaultConstructorObject,
-                ...args
+        createModal() {
+            instance.modal = document.createElement("div");
+            instance.configuration.styleDomElements ? instance.modal.setAttribute("style", "position: fixed; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; z-index: 10000") : null;
+
+            const modalOverlay = document.createElement("div");
+            instance.configuration.styleDomElements ? modalOverlay.setAttribute("style", "background-color: rgba(0,0,0,.3); position: absolute; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; cursor: pointer") : null;
+            modalOverlay.classList.add("SimpleSerial-modal-overlay");
+
+            const modalContainer = document.createElement("div");
+            instance.configuration.styleDomElements ? modalContainer.setAttribute("style", "position: absolute; width: 100%; height: auto; padding: 4rem; box-sizing: border-box; ") : null;
+            modalContainer.classList.add("SimpleSerial-modal-container");
+
+            const modalInner = document.createElement("div");
+            instance.configuration.styleDomElements ? modalInner.setAttribute("style", "background-color: #fff; border-radius: 4px; padding: 1rem; box-shadow: 0px 2px 11px 4px rgba(0,0,0, .09);") : null;
+            modalInner.classList.add("SimpleSerial-modal-inner");
+
+            const modalInnerText = document.createElement("p");
+            instance.configuration.styleDomElements ? modalInnerText.setAttribute("style", "color: #000") : null;
+            modalInnerText.innerText = instance.configuration.accessText;
+
+            const modalInnerButton = document.createElement("button");
+            modalInnerButton.innerText = instance.configuration.accessButtonLabel;
+            instance.requestSerialAccessOnClick(modalInnerButton);
+
+            modalInner.append(modalInnerText, modalInnerButton);
+            modalContainer.append(modalInner);
+            instance.modal.append(modalOverlay, modalContainer);
+
+            document.body.append(instance.modal);
+            return instance.modal;
+        },
+
+        removeModal() {
+            instance.modal.remove();
+        },
+
+        connect: async function() {
+            console.log("connect called");
+            instance.port = await navigator.serial.requestPort({ filters: instance.configuration.filters });
+            await instance.port.open({
+                baudRate: instance.configuration.baudRate
+            })
+            if (instance.configuration.requestAccessOnPageLoad) {
+                instance.removeModal();
             }
-        }
+            const textEncoder = new TextEncoderStream();
+            const writableStreamClosed = textEncoder.readable.pipeTo(instance.port.writable);
+            instance.writer = textEncoder.writable.getWriter();
+            let decoder = new TextDecoderStream();
+            const readableStreamClosed = instance.port.readable.pipeTo(decoder.writable)
+            const inputStream = decoder.readable;
+            const reader = decoder.readable
+                .pipeThrough(new TransformStream(instance.configuration.transformer))
+                .getReader()
+            await instance.readLoop(reader);
+        },
 
-        if (args.requestButton != null) {
-            args = {
-                requestAccessOnPageLoad: false,
-                ...args
+        on(name, callback) {
+            if (!instance._listeners[name]) {
+                instance._listeners[name] = [];
             }
-        }
+            instance._listeners[name].push(callback);
+            return [name, callback];
+        },
 
-        this.configuration = args;
-
-        // If a button or an id was supplied, attach an event listener to it.
-        if (this.configuration.requestButton) {
-            this.requestSerialAccessOnClick(this.configuration.requestButton);
-        }
-
-        // If the library should handle requesting access to the serial device, create a modal on page load.
-        if (this.configuration.requestAccessOnPageLoad) {
-            window.addEventListener("load", this.createModal.bind(this));
-        }
-        return this;
-    }
-
-    requestSerialAccessOnClick(element) {
-        if (typeof element === "string") {
-            // Search for HTML Element with this id
-            const el = document.getElementById(element)
-            if (!el) throw "Could not find element with ID '" + element + "'."
-            element = el;
-        }
-        element.addEventListener("click", this.connect.bind(this))
-    }
-
-    createModal() {
-        this.modal = document.createElement("div");
-        this.configuration.styleDomElements ? this.modal.setAttribute("style", "position: fixed; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; z-index: 10000") : null;
-
-        const modalOverlay = document.createElement("div");
-        this.configuration.styleDomElements ? modalOverlay.setAttribute("style", "background-color: rgba(0,0,0,.3); position: absolute; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; cursor: pointer") : null;
-        modalOverlay.classList.add("SimpleSerial-modal-overlay");
-
-        const modalContainer = document.createElement("div");
-        this.configuration.styleDomElements ? modalContainer.setAttribute("style", "position: absolute; width: 100%; height: auto; padding: 4rem; box-sizing: border-box; ") : null;
-        modalContainer.classList.add("SimpleSerial-modal-container");
-
-        const modalInner = document.createElement("div");
-        this.configuration.styleDomElements ? modalInner.setAttribute("style", "background-color: #fff; border-radius: 4px; padding: 1rem; box-shadow: 0px 2px 11px 4px rgba(0,0,0, .09);") : null;
-        modalInner.classList.add("SimpleSerial-modal-inner");
-
-        const modalInnerText = document.createElement("p");
-        this.configuration.styleDomElements ? modalInnerText.setAttribute("style", "color: #000") : null;
-        modalInnerText.innerText = this.configuration.accessText;
-
-        const modalInnerButton = document.createElement("button");
-        modalInnerButton.innerText = this.configuration.accessButtonLabel;
-        this.requestSerialAccessOnClick(modalInnerButton);
-
-        modalInner.append(modalInnerText, modalInnerButton);
-        modalContainer.append(modalInner);
-        this.modal.append(modalOverlay, modalContainer);
-
-        document.body.append(this.modal);
-        return this.modal;
-    }
-
-    removeModal() {
-        this.modal.remove();
-    }
-
-    async connect() {
-        this.port = await navigator.serial.requestPort({ filters: this.configuration.filters });
-        await this.port.open({
-            baudRate: this.configuration.baudRate
-        })
-        if (this.configuration.requestAccessOnPageLoad) {
-            this.removeModal();
-        }
-        const textEncoder = new TextEncoderStream();
-        const writableStreamClosed = textEncoder.readable.pipeTo(this.port.writable);
-        this.writer = textEncoder.writable.getWriter();
-        let decoder = new TextDecoderStream();
-        const readableStreamClosed = this.port.readable.pipeTo(decoder.writable)
-        const inputStream = decoder.readable;
-        const reader = decoder.readable
-            .pipeThrough(new TransformStream(this.configuration.transformer))
-            .getReader()
-        await this.readLoop(reader);
-    }
-
-    on(name, callback) {
-        if (!this._listeners[name]) {
-            this._listeners[name] = [];
-        }
-        this._listeners[name].push(callback);
-        return [name, callback];
-    }
-
-    removeListener(name, callbackToRemove) {
-        if (typeof name == "object" && typeof callbackToRemove == "undefined") {
-            callbackToRemove = name[1]
-            name = name[0];
-        }
-
-        if (!this._listeners[name]) {
-            throw new Error('There is no listener named ' + name + '.')
-        }
-
-        let length = this._listeners[name].length
-
-        this._listeners[name] = this._listeners[name].filter((listener) => listener !== callbackToRemove);
-        return length !== this._listeners[name].length;
-    }
-
-    // Remove all listeners of event name
-    removeListeners(name) {
-        if (typeof name !== "string") {
-            throw new Error("removeListeners expects a string as parameter, which will be used to remove all listeners of that event.");
-        }
-        const length = this._listeners[name].length
-        this._listeners[name] = [];
-        return length > 0;
-    }
-
-    async send(name, data) {
-        // If only 1 parameter is supplied, it's raw data.
-        if (typeof data === "undefined") {
-            if (this.configuration.logOutgoingSerialData) {
-                console.log(name);
+        removeListener(name, callbackToRemove) {
+            if (typeof name == "object" && typeof callbackToRemove == "undefined") {
+                callbackToRemove = name[1]
+                name = name[0];
             }
 
-            if (this.configuration.parseStringsAsNumbers) {
-                name = parseAsNumber(name);
+            if (!instance._listeners[name]) {
+                throw new Error('There is no listener named ' + name + '.')
             }
 
-            return this.sendData(name);
-        }
+            let length = instance._listeners[name].length
 
-        // If data is an object, parse its keys as ints
-        if (this.configuration.parseStringsAsNumbers) {
-            data = parseAsNumber(data);
-        }
+            instance._listeners[name] = instance._listeners[name].filter((listener) => listener !== callbackToRemove);
+            return length !== instance._listeners[name].length;
+        },
 
-        const event = [name, data]
-        const stringified = JSON.stringify(event);
-        if (this.configuration.logOutgoingSerialData) {
-            console.log(stringified);
-        }
-        return this.writer.write(stringified + this.configuration.newLineCharacter);
-    }
+        // Remove all listeners of event name
+        removeListeners(name) {
+            if (typeof name !== "string") {
+                throw new Error("removeListeners expects a string as parameter, which will be used to remove all listeners of that event.");
+            }
+            const length = instance._listeners[name].length
+            instance._listeners[name] = [];
+            return length > 0;
+        },
 
-    async sendEvent(name) {
-        return this.send("_e", name);
-    }
-
-    async sendData(data) {
-        return this.send("_d", data);
-    }
-
-    emit(name, data) {
-        if (this.configuration.warnAboutUnregisteredEvents && !this._listeners[name]) {
-            return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
-        }
-        this._listeners[name].forEach(callback => callback(data))
-    }
-
-    async readLoop(reader) {
-        while (true) {
-            const {value, done} = await reader.read();
-            if (value) {
-                // TODO check and validate value as valid JSON
-                let json = null;
-                try {
-                    json = JSON.parse(value)
-                } catch (e) {
-                    // console.error(e);
+        async send(name, data) {
+            // If only 1 parameter is supplied, it's raw data.
+            if (typeof data === "undefined") {
+                if (instance.configuration.logOutgoingSerialData) {
+                    console.log(name);
                 }
-                if (json) {
-                    if (this.configuration.logIncomingSerialData) {
-                        console.log(json);
+
+                if (instance.configuration.parseStringsAsNumbers) {
+                    name = parseAsNumber(name);
+                }
+
+                return instance.sendData(name);
+            }
+
+            // If data is an object, parse its keys as ints
+            if (instance.configuration.parseStringsAsNumbers) {
+                data = parseAsNumber(data);
+            }
+
+            const event = [name, data]
+            const stringified = JSON.stringify(event);
+            if (instance.configuration.logOutgoingSerialData) {
+                console.log(stringified);
+            }
+            return instance.writer.write(stringified + instance.configuration.newLineCharacter);
+        },
+
+        async sendEvent(name) {
+            return instance.send("_e", name);
+        },
+
+        async sendData(data) {
+            return instance.send("_d", data);
+        },
+
+        emit(name, data) {
+            if (instance.configuration.warnAboutUnregisteredEvents && !instance._listeners[name]) {
+                return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
+            }
+            instance._listeners[name].forEach(callback => callback(data))
+        },
+
+        async readLoop(reader) {
+            while (true) {
+                const {value, done} = await reader.read();
+                if (value) {
+                    // TODO check and validate value as valid JSON
+                    let json = null;
+                    try {
+                        json = JSON.parse(value)
+                    } catch (e) {
+                        // console.error(e);
                     }
-                    // If it's an array, handle accordingly
-                    if (typeof json == "object") {
-                        if (json[0] === "_w") {
-                            console.warn("[ARDUINO] " + json[1]);
-                            continue;
+                    if (json) {
+                        if (instance.configuration.logIncomingSerialData) {
+                            console.log(json);
+                        }
+                        // If it's an array, handle accordingly
+                        if (typeof json == "object") {
+                            if (json[0] === "_w") {
+                                console.warn("[ARDUINO] " + json[1]);
+                                continue;
+                            }
+
+                            if (json[0] === "_l") {
+                                console.log("[ARDUINO] " + json[1]);
+                                continue;
+                            }
+
+                            if (json[0] === "_e") {
+                                console.error("[ARDUINO] " + json[1]);
+                                continue;
+                            }
+
+                            // Reserved event name 'd': Data transfer. Register a listener "data" to listen to it.
+                            if (json[0] === "_d") {
+                                instance.emit('data', json[1]);
+                                continue;
+                            }
+
+                            instance.emit(json[0], json[1]);
                         }
 
-                        if (json[0] === "_l") {
-                            console.log("[ARDUINO] " + json[1]);
-                            continue;
+                        // If it's just a string, just call the event
+                        else if (typeof json == "string") {
+                            instance.emit(json, null)
                         }
 
-                        if (json[0] === "_e") {
-                            console.error("[ARDUINO] " + json[1]);
-                            continue;
+                    } else {
+                        if (instance.configuration.logIncomingSerialData) {
+                            console.log(value);
                         }
-
-                        // Reserved event name 'd': Data transfer. Register a listener "data" to listen to it.
-                        if (json[0] === "_d") {
-                            this.emit('data', json[1]);
-                            continue;
-                        }
-
-                        this.emit(json[0], json[1]);
-                    }
-
-                    // If it's just a string, just call the event
-                    else if (typeof json == "string") {
-                        this.
-                        emit(json, null)
-                    }
-
-                } else {
-                    if (this.configuration.logIncomingSerialData) {
-                        console.log(value);
                     }
                 }
-            }
-            if (done) {
-                console.log('[readLoop] DONE', done);
-                reader.releaseLock();
-                break;
+                if (done) {
+                    console.log('[readLoop] DONE', done);
+                    reader.releaseLock();
+                    break;
+                }
             }
         }
     }
+
+    // If a button or an id was supplied, attach an event listener to it.
+    if (configuration.requestButton) {
+        instance.requestSerialAccessOnClick(configuration.requestButton);
+    }
+
+    // If the library should handle requesting access to the serial device, create a modal on page load.
+    if (configuration.requestAccessOnPageLoad) {
+        window.addEventListener("load", instance.createModal());
+    }
+
+    return instance;
 }
