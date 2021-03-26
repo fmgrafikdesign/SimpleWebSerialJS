@@ -145,7 +145,6 @@ const SimpleSerial = function(args) {
         },
 
         connect: async function() {
-            console.log("connect called");
             instance.port = await navigator.serial.requestPort({ filters: instance.configuration.filters });
             await instance.port.open({
                 baudRate: instance.configuration.baudRate
