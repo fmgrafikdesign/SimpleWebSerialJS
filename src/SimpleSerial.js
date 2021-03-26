@@ -256,7 +256,6 @@ export class SimpleSerial {
         while (true) {
             const {value, done} = await reader.read();
             if (value) {
-                // Use vanilla for as it's faster than forEach
                 // TODO check and validate value as valid JSON
                 let json = null;
                 try {
