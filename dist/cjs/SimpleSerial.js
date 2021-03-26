@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 const DEFAULT_BAUDRATE = 57600;
 const NEW_LINE = '\n';
 
@@ -34,7 +36,7 @@ function parseAsNumber(value) {
         let obj = {};
         Object.keys(value).forEach(key => {
             obj[key] = parseAsNumber(value[key]);
-        })
+        });
         return obj;
     } else {
         return value;
@@ -56,7 +58,7 @@ const defaultConstructorObject = {
     // TODO mention this new property in documentation
     warnAboutUnregisteredEvents: true,
     filters: []
-}
+};
 
 class SimpleSerial {
     configuration;
@@ -75,7 +77,7 @@ class SimpleSerial {
             args = {
                 ...defaultConstructorObject,
                 baudRate: args
-            }
+            };
         } else if (typeof args === "undefined") {
             args = defaultConstructorObject;
         } else if (typeof args === 'object') {
@@ -85,18 +87,18 @@ class SimpleSerial {
             args = {
                 ...defaultConstructorObject,
                 ...args
-            }
+            };
         }
 
         if (args.requestButton != null) {
             args = {
                 requestAccessOnPageLoad: false,
                 ...args
-            }
+            };
         }
 
         this.configuration = args;
-        console.log("SimpleSerial instance created")
+        console.log("SimpleSerial instance created");
 
         // If a button or an id was supplied, attach an event listener to it.
         if (this.configuration.requestButton) {
@@ -113,11 +115,11 @@ class SimpleSerial {
     requestSerialAccessOnClick(element) {
         if (typeof element === "string") {
             // Search for HTML Element with this id
-            const el = document.getElementById(element)
+            const el = document.getElementById(element);
             if (!el) throw "Could not find element with ID '" + element + "'."
             element = el;
         }
-        element.addEventListener("click", this.connect.bind(this))
+        element.addEventListener("click", this.connect.bind(this));
     }
 
     createModal() {
@@ -161,19 +163,18 @@ class SimpleSerial {
         console.log(this.port.getInfo());
         await this.port.open({
             baudRate: this.configuration.baudRate
-        })
+        });
         if (this.configuration.requestAccessOnPageLoad) {
             this.removeModal();
         }
         const textEncoder = new TextEncoderStream();
-        const writableStreamClosed = textEncoder.readable.pipeTo(this.port.writable);
+        textEncoder.readable.pipeTo(this.port.writable);
         this.writer = textEncoder.writable.getWriter();
         let decoder = new TextDecoderStream();
-        const readableStreamClosed = this.port.readable.pipeTo(decoder.writable)
-        const inputStream = decoder.readable;
+        this.port.readable.pipeTo(decoder.writable);
         const reader = decoder.readable
             .pipeThrough(new TransformStream(this.configuration.transformer))
-            .getReader()
+            .getReader();
         await this.readLoop(reader);
     }
 
@@ -187,7 +188,7 @@ class SimpleSerial {
 
     removeListener(name, callbackToRemove) {
         if (typeof name == "object" && typeof callbackToRemove == "undefined") {
-            callbackToRemove = name[1]
+            callbackToRemove = name[1];
             name = name[0];
         }
 
@@ -195,7 +196,7 @@ class SimpleSerial {
             throw new Error('There is no listener named ' + name + '.')
         }
 
-        let length = this._listeners[name].length
+        let length = this._listeners[name].length;
 
         this._listeners[name] = this._listeners[name].filter((listener) => listener !== callbackToRemove);
         return length !== this._listeners[name].length;
@@ -206,7 +207,7 @@ class SimpleSerial {
         if (typeof name !== "string") {
             throw new Error("removeListeners expects a string as parameter, which will be used to remove all listeners of that event.");
         }
-        const length = this._listeners[name].length
+        const length = this._listeners[name].length;
         this._listeners[name] = [];
         return length > 0;
     }
@@ -230,7 +231,7 @@ class SimpleSerial {
             data = parseAsNumber(data);
         }
 
-        const event = [name, data]
+        const event = [name, data];
         const stringified = JSON.stringify(event);
         if (this.configuration.logOutgoingSerialData) {
             console.log(stringified);
@@ -250,7 +251,7 @@ class SimpleSerial {
         if (this.configuration.warnAboutUnregisteredEvents && !this._listeners[name]) {
             return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
         }
-        this._listeners[name].forEach(callback => callback(data))
+        this._listeners[name].forEach(callback => callback(data));
     }
 
     async readLoop(reader) {
@@ -261,7 +262,7 @@ class SimpleSerial {
                 // TODO check and validate value as valid JSON
                 let json = null;
                 try {
-                    json = JSON.parse(value)
+                    json = JSON.parse(value);
                 } catch (e) {
                     // console.error(e);
                 }
@@ -298,7 +299,7 @@ class SimpleSerial {
                     // If it's just a string, just call the event
                     else if (typeof json == "string") {
                         this.
-                        emit(json, null)
+                        emit(json, null);
                     }
 
                 } else {
@@ -315,3 +316,6 @@ class SimpleSerial {
         }
     }
 }
+
+exports.default = SimpleSerial;
+//# sourceMappingURL=SimpleSerial.js.map
