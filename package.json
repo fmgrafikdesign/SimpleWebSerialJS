@@ -1,6 +1,6 @@
 {
   "name": "simple-web-serial",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Connect an Arduino with your web application, in seconds. Use an event-driven approach and take advantage of a pre-configured web serial api setup routine.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
