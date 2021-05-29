@@ -1,8 +1,7 @@
+#define MaximumEventNameLength 24
 #include <SimpleWebSerial.h>
-
 SimpleWebSerial WebSerial;
 
-long unsigned reset = millis();
 int counter = 0;
 
 // the setup routine runs once when you press reset:

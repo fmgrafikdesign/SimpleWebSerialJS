@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Dark Mode</title>
+    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 36px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        #text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40%;
+            transform: translate(-50%, -50%);
+            padding-bottom: 10%;
+            z-index: 10;
+            transition: color 1000ms ease;
+        }
+
+        .dark-mode {
+            color: antiquewhite;
+        }
+
+        .dark-mode .background {
+            opacity: 1;
+        }
+
+        .background {
+            opacity: 0;
+            transition: opacity 1000ms ease;
+        }
+
+        /* Optical niceties */
+
+        @keyframes move-twink-back {
+            from {background-position:0 0;}
+            to {background-position:-10000px 5000px;}
+        }
+        @-webkit-keyframes move-twink-back {
+            from {background-position:0 0;}
+            to {background-position:-10000px 5000px;}
+        }
+        @-moz-keyframes move-twink-back {
+            from {background-position:0 0;}
+            to {background-position:-10000px 5000px;}
+        }
+        @-ms-keyframes move-twink-back {
+            from {background-position:0 0;}
+            to {background-position:-10000px 5000px;}
+        }
+
+        @keyframes move-clouds-back {
+            from {background-position:0 0;}
+            to {background-position:10000px 0;}
+        }
+        @-webkit-keyframes move-clouds-back {
+            from {background-position:0 0;}
+            to {background-position:10000px 0;}
+        }
+        @-moz-keyframes move-clouds-back {
+            from {background-position:0 0;}
+            to {background-position:10000px 0;}
+        }
+        @-ms-keyframes move-clouds-back {
+            from {background-position: 0;}
+            to {background-position:10000px 0;}
+        }
+
+        .stars, .twinkling {
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            width:100%;
+            height:100%;
+            display:block;
+        }
+
+        .stars {
+            background:#000 url(img/stars.png) repeat top center;
+            z-index:0;
+        }
+
+        .twinkling{
+            background:transparent url(img/twinkling.png) repeat top center;
+            z-index:1;
+
+            -moz-animation:move-twink-back 500s linear infinite;
+            -ms-animation:move-twink-back 500s linear infinite;
+            -o-animation:move-twink-back 500s linear infinite;
+            -webkit-animation:move-twink-back 500s linear infinite;
+            animation:move-twink-back 500s linear infinite;
+        }
+    </style>
+</head>
+<body>
+<p id="text">Put your hand on the Light Dependent Resistor so no light can shine through. This web page will enter dark mode automatically!</p>
+<div class="background">
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+</div>
+<script type="text/javascript">
+    let port;
+    let writer;
+
+    async function connect() {
+        port = await navigator.serial.requestPort();
+        await port.open({
+            baudRate: 9600
+        })
+        const textEncoder = new TextEncoderStream();
+        const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+        writer = textEncoder.writable.getWriter();
+        let decoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(decoder.writable)
+        const inputStream = decoder.readable;
+        const reader = decoder.readable
+            .pipeThrough(new TransformStream(new LineBreakTransformer()))
+            .getReader()
+        await readLoop(reader);
+    }
+
+    async function readLoop(reader) {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (value) {
+                setDarkMode();
+            }
+            if (done) {
+                console.log('[readLoop] DONE', done);
+                reader.releaseLock();
+                break;
+            }
+        }
+    }
+
+    function setDarkMode(darkmode) {
+        if(darkmode) {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+    };
+
+    class LineBreakTransformer {
+        constructor() {
+            // A container for holding stream data until a new line.
+            this.chunks = "";
+        }
+
+        transform(chunk, controller) {
+            // Append new chunks to existing chunks.
+            this.chunks += chunk;
+            // For each line breaks in chunks, send the parsed lines out.
+            const lines = this.chunks.split("\r\n");
+            this.chunks = lines.pop();
+            lines.forEach((line) => controller.enqueue(line));
+        }
+
+        flush(controller) {
+            // When the stream is closed, flush any remaining chunks out.
+            controller.enqueue(this.chunks);
+        }
+    }
+</script>
+</body>
+</html>

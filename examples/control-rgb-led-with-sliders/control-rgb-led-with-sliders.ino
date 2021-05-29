@@ -7,7 +7,7 @@ const int analogOutPin = 9; // Analog output pin that the LED is attached to
 int sensorValue = 0;        // value read from the pot
 int outputValue = 0;        // value output to the PWM (analog out)
 
-int r = 4;
+int r = 6;
 int g = 5;
 int b = 3;
 

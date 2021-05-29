@@ -17,6 +17,6 @@ void loop() {
   v = analogRead(A1);
   WebSerial.send("h", map(h, 0, 1023, 1, 49));
   WebSerial.send("v", map(v, 0, 1023, 1, 49));
-  
-  delay(50);        // delay in between reads for stability
+
+  delay(20);        // delay in between reads for stability
 }

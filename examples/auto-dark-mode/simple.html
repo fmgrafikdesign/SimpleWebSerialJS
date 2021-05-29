@@ -1,0 +1,23 @@
+
+<head>
+    <script lang="text/javascript" src="https://unpkg.com/simple-web-serial@latest/dist/simple-serial.min.js"></script>
+</head>
+<body></body>
+<style>
+    body { transition: background-color .2s ease }
+    .dark-mode { background: black; }
+</style>
+
+<script>
+    const conn = SimpleSerial.connect({
+        requestAccessOnPageLoad: true
+    });
+
+    conn.on("darkmode", function(darkmode) {
+        if(darkmode) {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+    })
+</script>

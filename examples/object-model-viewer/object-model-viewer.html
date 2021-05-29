@@ -59,6 +59,7 @@
         let i = 0;
         // r is for 'rotation'. Keeping the event name short enables us to send it more often until event indexing is implemented.
         conn.on("r", function (rotation) {
+            console.log((new TextEncoder().encode(JSON.stringify(rotation))).length);
             // rotation is an object with the keys x and y for the x and y axis of rotation respectively.
             // They arrive from -180 to 180, and we'll map them to radians.
             Number.prototype.map = function (in_min, in_max, out_min, out_max) {

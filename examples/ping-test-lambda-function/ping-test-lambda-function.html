@@ -28,9 +28,11 @@
         * {
             box-sizing: border-box;
         }
+
         *::before, *::after {
             box-sizing: border-box;
         }
+
         body {
             font-family: monospace;
             font-size: 32px;
@@ -42,6 +44,7 @@
             min-height: 100vh;
             background: var(--backgroundColor);
         }
+
         button {
             position: relative;
             display: block;
@@ -51,7 +54,7 @@
             vertical-align: middle;
             text-decoration: none;
             font-size: 1.5rem;
-            color:var(--colorShadeA);
+            color: var(--colorShadeA);
             font-weight: 700;
             text-transform: uppercase;
             font-family: inherit;
@@ -65,6 +68,7 @@
             transform-style: preserve-3d;
             transition: all 175ms cubic-bezier(0, 0, 1, 1);
         }
+
         button.big-button::before {
             position: absolute;
             content: '';
@@ -109,20 +113,22 @@
 <script>
     // To save us set up time, we let the library handle requesting access to the Web Serial API
     const conn = SimpleSerial.connect({
-        requestAccessOnPageLoad: true
+        requestAccessOnPageLoad: true,
+        logIncomingSerialData: true
     });
 
     let timestamp = null;
+
     // When we click on the ping button, send the event "ping" to the Arduino.
     // We use an arrow function here as our callback, just to write a few less characters.
     document.getElementById("ping").addEventListener("click", () => {
         timestamp = performance.now();
-        conn.sendEvent("ping");
+        conn.send("ping", 0);
     })
 
     // When we receive the "pong" event, show how long it took.
     // Again, we write our callback as an arrow function.
-    conn.on("pong", (pingNumber) => {
+    conn.on("pong", pingNumber => {
         const rounded = Math.round((performance.now() - timestamp));
         document.getElementById("pingback").innerText = "Pingback arrived after ~" + rounded + "ms [#" + pingNumber + "]";
     })

@@ -1,5 +1,3 @@
-'use strict';
-
 const DEFAULT_BAUDRATE = 57600;
 
 // Simple TransformStream used to chop incoming serial data up when a new line character appears.
@@ -28,15 +26,15 @@ function parseAsNumber(value) {
     } else if (Array.isArray(value)) {
         let array = [];
         value.forEach(item => {
-            array.push(parseAsNumber(item))
-        })
+            array.push(parseAsNumber(item));
+        });
         return array;
     } else if (typeof value == "object") {
         // Iterate over keys, return parsed values
         let obj = {};
         Object.keys(value).forEach(key => {
             obj[key] = parseAsNumber(value[key]);
-        })
+        });
         return obj;
     } else {
         return value;
@@ -58,9 +56,9 @@ const defaultConstructorObject = {
     warnAboutUnregisteredEvents: true,
     newLineCharacter: '\n',
     filters: []
-}
+};
 
-export default function connect(args) {
+function connect(args) {
     return SimpleSerial(args)
 }
 
@@ -73,7 +71,7 @@ const SimpleSerial = function (args) {
         args = {
             ...defaultConstructorObject,
             baudRate: args
-        }
+        };
     } else if (typeof args === "undefined") {
         args = defaultConstructorObject;
     } else if (typeof args === 'object') {
@@ -83,14 +81,14 @@ const SimpleSerial = function (args) {
         args = {
             ...defaultConstructorObject,
             ...args
-        }
+        };
     }
 
     if (args.requestButton != null) {
         args = {
             requestAccessOnPageLoad: false,
             ...args
-        }
+        };
     }
 
     let configuration = args;
@@ -106,11 +104,11 @@ const SimpleSerial = function (args) {
         requestSerialAccessOnClick: function (element) {
             if (typeof element === "string") {
                 // Search for HTML Element with this id
-                const el = document.getElementById(element)
+                const el = document.getElementById(element);
                 if (!el) throw "Could not find element with ID '" + element + "'."
                 element = el;
             }
-            element.addEventListener("click", instance.connect)
+            element.addEventListener("click", instance.connect);
         },
 
         createModal() {
@@ -153,24 +151,23 @@ const SimpleSerial = function (args) {
             instance.port = await navigator.serial.requestPort({filters: instance.configuration.filters});
             await instance.port.open({
                 baudRate: instance.configuration.baudRate
-            })
+            });
             if (instance.configuration.requestAccessOnPageLoad) {
                 instance.removeModal();
             }
             const textEncoder = new TextEncoderStream();
-            const writableStreamClosed = textEncoder.readable.pipeTo(instance.port.writable);
+            textEncoder.readable.pipeTo(instance.port.writable);
             instance.writer = textEncoder.writable.getWriter();
             let decoder = new TextDecoderStream();
-            const readableStreamClosed = instance.port.readable.pipeTo(decoder.writable)
-            const inputStream = decoder.readable;
+            instance.port.readable.pipeTo(decoder.writable);
             const reader = decoder.readable
                 .pipeThrough(new TransformStream(instance.configuration.transformer))
-                .getReader()
+                .getReader();
             instance.readLoop(reader).then(response => {
                 console.log(response);
             }).catch(e => {
-                console.error("Could not read serial data. Please make sure the same baud rate is used on device (Serial.begin()) and library. Library currently uses baud rate", instance.configuration.baudRate, "Please also make sure you're not sending too much serial data. Consider using (a higher) delay() to throttle the amount of data sent.")
-                console.error(e)
+                console.error("Could not read serial data. Please make sure the same baud rate is used on device (Serial.begin()) and library. Library currently uses baud rate", instance.configuration.baudRate, "Please also make sure you're not sending too much serial data. Consider using (a higher) delay() to throttle the amount of data sent.");
+                console.error(e);
             });
 
         },
@@ -185,7 +182,7 @@ const SimpleSerial = function (args) {
 
         removeListener(name, callbackToRemove) {
             if (typeof name == "object" && typeof callbackToRemove == "undefined") {
-                callbackToRemove = name[1]
+                callbackToRemove = name[1];
                 name = name[0];
             }
 
@@ -193,7 +190,7 @@ const SimpleSerial = function (args) {
                 throw new Error('There is no listener named ' + name + '.')
             }
 
-            let length = instance._listeners[name].length
+            let length = instance._listeners[name].length;
 
             instance._listeners[name] = instance._listeners[name].filter((listener) => listener !== callbackToRemove);
             return length !== instance._listeners[name].length;
@@ -204,7 +201,7 @@ const SimpleSerial = function (args) {
             if (typeof name !== "string") {
                 throw new Error("removeListeners expects a string as parameter, which will be used to remove all listeners of that event.");
             }
-            const length = instance._listeners[name].length
+            const length = instance._listeners[name].length;
             instance._listeners[name] = [];
             return length > 0;
         },
@@ -263,7 +260,7 @@ const SimpleSerial = function (args) {
             if (instance.configuration.warnAboutUnregisteredEvents && !instance._listeners[name]) {
                 return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
             }
-            instance._listeners[name].forEach(callback => callback(data))
+            instance._listeners[name].forEach(callback => callback(data));
         },
 
         async readLoop(reader) {
@@ -273,7 +270,7 @@ const SimpleSerial = function (args) {
                 if (value) {
                     let json = null;
                     try {
-                        json = JSON.parse(value)
+                        json = JSON.parse(value);
                     } catch (e) {}
                     if (json) {
                         if (instance.configuration.logIncomingSerialData) {
@@ -307,7 +304,7 @@ const SimpleSerial = function (args) {
 
                         // If it's just a string, just call the event
                         else if (typeof json == "string") {
-                            instance.emit(json, null)
+                            instance.emit(json, null);
                         }
 
                     } else {
@@ -323,7 +320,7 @@ const SimpleSerial = function (args) {
                 }
             }
         }
-    }
+    };
 
 // If a button or an id was supplied, attach an event listener to it.
     if (configuration.requestButton) {
@@ -336,4 +333,7 @@ const SimpleSerial = function (args) {
     }
 
     return instance;
-}
+};
+
+export { connect };
+//# sourceMappingURL=index.js.map

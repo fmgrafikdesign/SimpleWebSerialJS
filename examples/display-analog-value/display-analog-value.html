@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Display Analog Value</title>
+    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+</head>
+<body>
+<div id="log"></div>
+<script>
+    const conn = SimpleSerial.connect({
+        requestAccessOnPageLoad: true,
+    });
+
+    conn.on("value", value => {
+        document.getElementById('log').innerText = value;
+    })
+</script>
+</body>
+</html>
