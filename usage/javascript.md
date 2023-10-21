@@ -96,6 +96,12 @@ If set to true, will use console.log() to log all incoming serial data from the 
 **logOutgoingSerialData: bool** _(Default: false)_\
 If set to true, will use console.log() to log all outgoing serial data from the browser. Use for debugging.
 
+**warnAboutUnregisteredEvents: bool** _(Default: true)_\
+If set to true, the browser will tell you if events are being sent that have no registered listener.
+
+**newLineCharacter: string**_(Default: '\n')_\
+_The character to use as a delimiter in the new line transformer._
+
 **parseStringsAsNumber: bool** _(Default: true)_\
 If set to true, will try to parse strings as numbers to avoid type errors. Example: Values from inputs like sliders or text inputs are strings. This setting will convert them into numbers so they can be used by the Arduino as such.
 
