@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Plain - Control LED with button</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
 </head>
 <body>
 <button id="permissionElement">Connect to Serial Port</button>
@@ -12,7 +12,7 @@
 <script type="text/javascript">
     let toggle = false;
 
-    const connection = SimpleSerial.connect({
+    const connection = SimpleWebSerial.connect({
         requestButton: "permissionElement"
     })
 

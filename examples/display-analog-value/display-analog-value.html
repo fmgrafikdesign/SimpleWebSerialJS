@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Display Analog Value</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
 </head>
 <body>
 <div id="log"></div>
 <script>
-    const conn = SimpleSerial.connect({
+    const conn = SimpleWebSerial.connect({
         requestAccessOnPageLoad: true,
     });
 

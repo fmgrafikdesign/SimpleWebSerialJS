@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Push vs Poll</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
     </style>
 </head>
@@ -25,7 +25,7 @@
     // Controls an LED
     let on = 0;
 
-    const conn = SimpleSerial.connect();
+    const conn = SimpleWebSerial.connect();
 
     /* PUSH: The web page sends */
     let interval = setInterval(sendLEDState, 20)

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Working with an API</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -102,7 +102,7 @@
 </div>
 <script>
     // To save us set up time, we let the library handle requesting access to the Web Serial API
-    const conn = SimpleSerial.connect();
+    const conn = SimpleWebSerial.connect();
 
     // When we receive the "cat-fact" event, call our callback function
     // We write our callback as an asynchronous function, so we can await the API response.

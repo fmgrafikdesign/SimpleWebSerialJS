@@ -15,9 +15,9 @@ export default [
             terser(),
         ],
         output: {
-            file: `dist/simple-serial.min.js`,
+            file: `dist/simple-web-serial.min.js`,
             format: "umd",
-            name: "SimpleSerial", // this is the name of the global object
+            name: "SimpleWebSerial", // this is the name of the global object
             esModule: false,
             exports: "named",
             sourcemap: true,

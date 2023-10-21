@@ -63,10 +63,10 @@ const defaultConstructorObject = {
 };
 
 function connect(args) {
-    return SimpleSerial(args)
+    return SimpleWebSerial(args)
 }
 
-const SimpleSerial = function (args) {
+const SimpleWebSerial = function (args) {
     if (!navigator.serial) {
         throw new Error("The Serial API not supported in your browser. Make sure you've enabled flags if necessary!");
     }
@@ -121,15 +121,15 @@ const SimpleSerial = function (args) {
 
             const modalOverlay = document.createElement("div");
             instance.configuration.styleDomElements ? modalOverlay.setAttribute("style", "background-color: rgba(0,0,0,.3); position: absolute; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; cursor: pointer") : null;
-            modalOverlay.classList.add("SimpleSerial-modal-overlay");
+            modalOverlay.classList.add("SimpleWebSerial-modal-overlay");
 
             const modalContainer = document.createElement("div");
             instance.configuration.styleDomElements ? modalContainer.setAttribute("style", "position: absolute; width: 100%; height: auto; padding: 4rem; box-sizing: border-box; ") : null;
-            modalContainer.classList.add("SimpleSerial-modal-container");
+            modalContainer.classList.add("SimpleWebSerial-modal-container");
 
             const modalInner = document.createElement("div");
             instance.configuration.styleDomElements ? modalInner.setAttribute("style", "background-color: #fff; border-radius: 4px; padding: 1rem; box-shadow: 0px 2px 11px 4px rgba(0,0,0, .09);") : null;
-            modalInner.classList.add("SimpleSerial-modal-inner");
+            modalInner.classList.add("SimpleWebSerial-modal-inner");
 
             const modalInnerText = document.createElement("p");
             instance.configuration.styleDomElements ? modalInnerText.setAttribute("style", "color: #000") : null;
@@ -164,6 +164,7 @@ const SimpleSerial = function (args) {
             instance.writer = textEncoder.writable.getWriter();
             let decoder = new TextDecoderStream();
             instance.port.readable.pipeTo(decoder.writable);
+            decoder.readable;
             const reader = decoder.readable
                 .pipeThrough(new TransformStream(instance.configuration.transformer))
                 .getReader();
@@ -339,5 +340,5 @@ const SimpleSerial = function (args) {
     return instance;
 };
 
-exports.connect = connect;
+exports.SimpleWebSerial = connect;
 //# sourceMappingURL=index.js.map
