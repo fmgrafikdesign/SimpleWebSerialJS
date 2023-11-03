@@ -23,26 +23,28 @@ description: >-
 
 ### JavaScript
 
-The complete code for the example can be found [here](auto-dark-mode/auto-dark-mode.html). The code listed below is enough to make the example work, but it's not quite as pretty as the full example.
+The complete code for the example can be found [here](https://github.com/fmgrafikdesign/SimpleWebSerialJS/blob/main/examples/auto-dark-mode/auto-dark-mode.html). The code listed below is enough to make the example work, but it's not quite as pretty as the full example.
 
 ```markup
 <head>
-    <script lang="text/javascript" src="https://unpkg.com/simple-web-serial@latest/dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
 </head>
-
+<body>
+<h1>Cover the light sensor and this page will go dark automatically!</h1>
+</body>
 <style>
     body { transition: background-color .2s ease }
-    .dark-mode { background-color: black; }
+    .dark-mode { background: black; }
+    h1 { transition: color .2s ease; }
+    .dark-mode h1 { color: #fff; }
 </style>
 
-<body></body>
-
 <script>
-    const conn = SimpleSerial.connect({
+    const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true
     });
-    
-    conn.on("darkmode", function(darkmode) {
+
+    connection.on("darkmode", function(darkmode) {
         if(darkmode) {
             document.body.classList.add("dark-mode");
         } else {

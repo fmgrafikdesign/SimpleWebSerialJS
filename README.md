@@ -1,28 +1,35 @@
-
+---
+description: >-
+  SimpleWebSerial helps you to connect an Arduino with your web application, in
+  seconds.
+---
 
 # Introduction
 
-SimpleWebSerial helps you to connect an Arduino with your web application, in
-seconds. This is the JavaScript part of the project. You can find the Arduino part [here](https://github.com/fmgrafikdesign/simplewebserial-arduino-library).
+![](.gitbook/assets/titelbild-v4.jpg)
 
-<img src=".gitbook/assets/titelbild-v4.jpg" alt="A graphic visualising the event-driven architecture of the project">
+{% hint style="warning" %}
+This library uses the Web Serial API, which is not widely supported beyond Chrome and Edge browsers. If biggest possible browser support is important to your project, using this library may be the wrong approach. You can check current browser support [here](https://caniuse.com/web-serial).
+{% endhint %}
 
 ## What is this library?
 
-This library allows you to connect your website in the browser with an Arduino microcontroller. This effectively means the real world can influence your web application, and vice versa. The library consists of two parts, the [JavaScript part](https://github.com/fmgrafikdesign/SimpleWebSerialJS) which runs in the browser, and the [Arduino part](https://github.com/fmgrafikdesign/simplewebserial-arduino-library) which is installed on your Arduino device. Together, they allow you to write simple, event-driven code both in JavaScript and on the Arduino, enabling two-way communication.
+This library allows you to connect your website in the browser with an Arduino microcontroller. It consists of two parts, the [JavaScript part](https://github.com/fmgrafikdesign/SimpleWebSerialJS) which runs in the browser, and the [Arduino part](https://github.com/fmgrafikdesign/simplewebserial-arduino-library) which is installed on your Arduino device.
 
-Under the hood, it uses the [Web Serial API](https://wicg.github.io/serial/). It handles repetitive setup steps and offers an event-driven style of listening to and sending data. The goal is to allow as many people as possible to explore the possibilities of connecting physical devices to web applications.
+Under the hood, it uses the [Web Serial API](https://wicg.github.io/serial/). It handles repetitive setup steps and offers an event-driven style of listening to and sending data.
+
+The goal is to allow as many people as possible to explore the possibilities of connecting physical devices to web applications.
 
 ## Code Style Summary
 
 This library employs an event-driven code style. You can register event listeners with callback functions, and send events to the other device. Here's a brief idea how working with the library looks like in the browser and on the Arduino:
 
-### JavaScript
-```javascript
-// Import
-
+{% tabs %}
+{% tab title="JavaScript" %}
+<pre class="language-javascript"><code class="lang-javascript"><strong>import { setupSerialConnection } from 'simple-web-serial';
+</strong>
 // Set up the serial connection
-const connection = SimpleWebSerial.connect({ requestAccessOnPageLoad: true });
+const connection = setupSerialConnection({ requestAccessOnPageLoad: true });
 
 // React to incoming events
 connection.on('event-from-arduino', function(data) {
@@ -33,9 +40,10 @@ connection.on('event-from-arduino', function(data) {
 connection.send('event-to-arduino', "Hello there, Arduino");
 
 // That's the basics!
-```
+</code></pre>
+{% endtab %}
 
-### Arduino
+{% tab title="Arduino" %}
 ```c
 // Include the library
 #include <SimpleWebSerial.h>
@@ -65,6 +73,8 @@ void loop() {
   delay(5);
 }
 ```
+{% endtab %}
+{% endtabs %}
 
 ## Why this library?
 

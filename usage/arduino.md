@@ -8,7 +8,7 @@ Basic knowledge of Arduino programming is assumed.
 
 Please make sure you've completed the [set-up for Arduino](../installation/arduino.md).
 
-In your set-up routine, initialize serial communication with your PC. Remember to include the library:
+In your set-up routine, you initialize serial communication. Remember to include the library:
 
 ```c
 #include <SimpleWebSerial.h>
@@ -141,7 +141,7 @@ The serial protocol and arduino serial buffer are not made for high throughput. 
 
 ## Methods
 
-### .check()
+### `.check()`
 
 **It is crucial that you call this method in your loop() function.** This method checks if there is serial data to be parsed and delegates it to registered events. Make sure to include it in your loop function like this:
 
@@ -152,9 +152,9 @@ void loop() {
 }
 ```
 
-### .on(eventname, callback)
+### `.on(eventname, callback)`
 
-This function defines an event the library should listen to, and the callback that should be executed when the event happens. Please note that when programming for Arduino, **there is a difference between `'` and `"`**, and the latter should be used when defining event names. It's also a strong typed language, which means we have to specify the type of parameter in our callback, a `JSONVar`. Example:
+This function defines an event the library should listen to, and the callback that should be executed when the event happens. Please note that when programming for Arduino, **there is a difference between `'` and `"`**, and the latter should be used when defining event names. It's also a strongly typed language, which means we have to specify the type of parameter in our callback, a `JSONVar`. Example:
 
 ```c
 WebSerial.on("browser-event", doSomething);
@@ -177,7 +177,7 @@ WebSerial.on("browser-event", [](JSONVar data) {
 });
 ```
 
-### .send(eventname, data)
+### `.send(eventname, data)`
 
 Send an event to the browser. First parameter is the event name, second any valid json that is sent to the callback function of the event on the web page. Example:
 
@@ -190,7 +190,7 @@ obj["status"] = true;
 WebSerial.send("pin-status", obj); // Send event "pin-status" with obj as payload
 ```
 
-### .sendEvent(eventname)
+### `.sendEvent(eventname)`
 
 If you just want to send an event without any payload, you can use this helper function. Example:
 
@@ -208,7 +208,7 @@ connection.on("motionSensor", functionCallback);
 {% endtab %}
 {% endtabs %}
 
-### .sendData(JSONVar data)
+### `.sendData(JSONVar data)`
 
 If you want to send pure data, you can use this. This will omit the event name and can be listened to in the web application via .on("data", callback). Example:
 
@@ -226,9 +226,9 @@ connection.on("data", functionCallback);
 {% endtab %}
 {% endtabs %}
 
-### .listEvents()
+### `.listEvents()`
 
-This function uses Serial.println to print a list of currently registered events on the Arduino. Example:
+This function uses Serial.println to print a list of currently registered events on the Arduino. Useful for debugging. Example:
 
 ```c
 #include <SimpleWebSerial.h>;
@@ -249,9 +249,9 @@ void setup() {
 // - another-event
 ```
 
-### .log(message)
+### `.log(message)`
 
-This will log a message in the browser's console. Use it for debugging purposes. Example:
+This will log a message in the browser's console. Useful for debugging. Example:
 
 ```c
 #include <SimpleWebSerial.h>;
@@ -267,7 +267,7 @@ void setup() {
 // [ARDUINO] Initial read suggests something's wrong!
 ```
 
-### .warn(message)
+### `.warn(message)`
 
 This will display a warning in the browser's console. Use it for debugging purposes, or to warn if something bad has happened or is about to happen. Example:
 
@@ -287,7 +287,7 @@ void setup() {
 // ⚠ [ARDUINO] Initial read suggests something's wrong!
 ```
 
-### .error(message)
+### `.error(message)`
 
 This will display an error in the browser's console. Use for debugging purposes. Example:
 
