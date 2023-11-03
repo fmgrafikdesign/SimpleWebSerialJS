@@ -25,13 +25,13 @@
     // Controls an LED
     let on = 0;
 
-    const conn = SimpleWebSerial.connect();
+    const connection = SimpleWebSerial.connect();
 
     /* PUSH: The web page sends */
     let interval = setInterval(sendLEDState, 20)
 
     function sendLEDState() {
-        conn.sendEvent("led", on);
+        connection.sendEvent("led", on);
     }
 
     function toggleMode() {
