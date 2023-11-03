@@ -12,9 +12,8 @@
 <script type="text/javascript">
     let toggle = false;
 
-    const connection = SimpleWebSerial.connect({
-        requestButton: "permissionElement"
-    })
+    const connection = SimpleWebSerial.setupSerialConnection();
+    document.querySelector('#permissionElement').addEventListener('click', connection.startConnection);
 
     async function toggleLED() {
         const byte = (toggle = !toggle) ? 0 : 1

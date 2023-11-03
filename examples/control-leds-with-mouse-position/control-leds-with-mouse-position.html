@@ -8,13 +8,15 @@
 <body>
 
 <script>
-    const conn = SimpleWebSerial.connect();
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true
+    });
 
     window.addEventListener("mousemove", event => {
         const { clientX, clientY } = event;
         const x = Math.floor(255 * clientX / window.innerWidth)
         const y = Math.floor(255 * clientY / window.innerHeight)
-        conn.send("p", [x,y])
+        connection.send("p", [x,y])
     })
 </script>
 

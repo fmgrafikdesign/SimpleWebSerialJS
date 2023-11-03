@@ -8,11 +8,11 @@
 <body>
 <div id="log"></div>
 <script>
-    const conn = SimpleWebSerial.connect({
+    const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true,
     });
 
-    conn.on("value", value => {
+    connection.on("value", value => {
         document.getElementById('log').innerText = value;
     })
 </script>

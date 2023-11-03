@@ -76,10 +76,6 @@
             }
         }
 
-        .flex {
-            display: flex;
-        }
-
         .wrapper {
             max-width: 800px;
             width: 100%;
@@ -97,16 +93,18 @@
 <body>
 <div class="wrapper">
     <p id="cat-fact">For emergency cat fact press button.</p>
-    <img id="cat-image" src="" />
+    <img id="cat-image" src="" alt="a cat-related image"/>
     <div id="loading" class="lds-heart hide"><div></div></div>
 </div>
 <script>
     // To save us set up time, we let the library handle requesting access to the Web Serial API
-    const conn = SimpleWebSerial.connect();
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true,
+    });
 
     // When we receive the "cat-fact" event, call our callback function
     // We write our callback as an asynchronous function, so we can await the API response.
-    conn.on("cat-fact", async function() {
+    connection.on("cat-fact", async function() {
         // Hide our cat-fact text and show our loading spinner
         document.getElementById("cat-fact").classList.toggle("hide");
         document.getElementById("loading").classList.toggle("hide");

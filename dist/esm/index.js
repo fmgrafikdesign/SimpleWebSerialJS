@@ -39,10 +39,10 @@ function parseAsNumber(value) {
 
 const DEFAULT_CONSTRUCTOR_OBJECT = {
     baudRate: DEFAULT_BAUDRATE,
-    requestButton: null,
-    requestAccessOnPageLoad: true,
-    accessText: 'To access serial devices, user interaction is required. Please press this button to select the port you want to connect to.',
-    accessButtonLabel: 'Connect to Serial Port',
+    requestElement: null,
+    requestAccessOnPageLoad: false,
+    accessText: 'Please press this button to select the serial device you want to connect to.',
+    accessButtonLabel: 'Choose device / port',
     styleDomElements: true,
     transformer: new LineBreakTransformer(),
     logIncomingSerialData: false,
@@ -57,6 +57,7 @@ function createConnectionInstance(configuration) {
     let port = null;
     let writer = null;
     let modalElement = null;
+    let modalErrorElement = null;
     let _listeners = {};
 
     function requestSerialAccessOnClick(element) {
@@ -70,8 +71,15 @@ function createConnectionInstance(configuration) {
     }
 
     function createModal() {
-        const [modal, modalOverlay, modalContainer, modalInner, modalInnerText, modalInnerButton] =
-            ['div', 'div', 'div', 'div', 'p', 'button'].map(tag => document.createElement(tag));
+        const [
+            modal,
+            modalOverlay,
+            modalContainer,
+            modalInner,
+            modalInnerText,
+            modalErrorText,
+            modalInnerButton
+        ] = ['div', 'div', 'div', 'div', 'p', 'p', 'button'].map(tag => document.createElement(tag));
         modalContainer.classList.add('SimpleWebSerial-modal-container');
         modalOverlay.classList.add('SimpleWebSerial-modal-overlay');
         modalInner.classList.add('SimpleWebSerial-modal-inner');
@@ -82,6 +90,7 @@ function createConnectionInstance(configuration) {
             modalContainer.setAttribute('style', 'position: absolute; width: 100%; height: auto; padding: 4rem; box-sizing: border-box;');
             modalInner.setAttribute('style', 'background-color: #fff; border-radius: 4px; padding: 1rem; box-shadow: 0px 2px 11px 4px rgba(0,0,0, .09);');
             modalInnerText.setAttribute('style', 'color: #000');
+            modalErrorText.setAttribute('style', 'color: #dd0000');
         }
 
         modalInnerText.innerText = configuration.accessText;
@@ -89,13 +98,19 @@ function createConnectionInstance(configuration) {
         modalInnerButton.innerText = configuration.accessButtonLabel;
         requestSerialAccessOnClick(modalInnerButton);
 
-        modalInner.append(modalInnerText, modalInnerButton);
+        modalInner.append(modalInnerText, modalErrorText, modalInnerButton);
         modalContainer.append(modalInner);
         modal.append(modalOverlay, modalContainer);
 
         modalElement = modal;
+        modalErrorElement = modalErrorText;
         document.body.append(modal);
         return modal
+    }
+
+    function showErrorMessageInModal(message) {
+        if (!modalErrorElement) return
+        modalErrorElement.innerHTML = message;
     }
 
     function removeModal() {
@@ -103,10 +118,16 @@ function createConnectionInstance(configuration) {
     }
 
     async function startConnection() {
-        port = await navigator.serial.requestPort({ filters: configuration.filters });
-        await port.open({
-            baudRate: configuration.baudRate
-        });
+        try {
+            port = await navigator.serial.requestPort({ filters: configuration.filters });
+            await port.open({
+                baudRate: configuration.baudRate
+            });
+        } catch (e) {
+            showErrorMessageInModal('There was an error trying to open a serial connection. ' +
+                'Please make sure the port is not occupied in another tab or process. Error message:<br>' + e);
+            throw new Error(e)
+        }
         if (configuration.requestAccessOnPageLoad) {
             removeModal();
         }
@@ -177,7 +198,6 @@ function createConnectionInstance(configuration) {
     }
 
     async function send(name, data) {
-        console.log('send', port.writable);
         if (!port?.writable) return
 
         // If only 1 parameter is supplied, it's raw data.
@@ -203,7 +223,6 @@ function createConnectionInstance(configuration) {
         if (configuration.logOutgoingSerialData) {
             console.log(stringified);
         }
-        console.log(writer.write);
         return writer.write(stringified + configuration.newLineCharacter)
     }
 
@@ -301,9 +320,6 @@ function createConnectionInstance(configuration) {
     }
 }
 
-// setupSerialConnection()
-// SimpleWebSerial.setupSerialConnection
-// Return a connection instance
 const setupSerialConnection = function (args) {
     if (!navigator.serial) {
         throw new Error('The Serial API not supported in your browser. Make sure you\'ve enabled flags if necessary!')
@@ -325,10 +341,10 @@ const setupSerialConnection = function (args) {
         };
     }
 
-    if (args.requestButton != null) {
+    if (args.requestElement != null) {
         args = {
+            ...args,
             requestAccessOnPageLoad: false,
-            ...args
         };
     }
 
@@ -337,8 +353,8 @@ const setupSerialConnection = function (args) {
     const instance = createConnectionInstance(configuration);
 
     // If a button or an id was supplied, attach an event listener to it.
-    if (configuration.requestButton) {
-        instance.requestSerialAccessOnClick(configuration.requestButton);
+    if (configuration.requestElement) {
+        instance.requestSerialAccessOnClick(configuration.requestElement);
     }
 
     // If the library should handle requesting access to the serial device, create a modal on page load.

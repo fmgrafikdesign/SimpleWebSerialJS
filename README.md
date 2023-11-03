@@ -3,13 +3,13 @@
 # Introduction
 
 SimpleWebSerial helps you to connect an Arduino with your web application, in
-seconds. This is the JavaScript part of the project. You can find the Arduino part here.
+seconds. This is the JavaScript part of the project. You can find the Arduino part [here](https://github.com/fmgrafikdesign/simplewebserial-arduino-library).
 
 <img src=".gitbook/assets/titelbild-v4.jpg" alt="A graphic visualising the event-driven architecture of the project">
 
 ## What is this library?
 
-This library allows you to connect your website in the browser with an Arduino microcontroller. This effectively means the real world can influence your web application, and vice versa. The library consists of two parts, the [JavaScript part](https://github.com/fmgrafikdesign/SimpleWebSerialJS) which runs in the browser, and the [Arduino part](https://github.com/fmgrafikdesign/simplewebserial-arduino-library) which is installed on your Arduino device.
+This library allows you to connect your website in the browser with an Arduino microcontroller. This effectively means the real world can influence your web application, and vice versa. The library consists of two parts, the [JavaScript part](https://github.com/fmgrafikdesign/SimpleWebSerialJS) which runs in the browser, and the [Arduino part](https://github.com/fmgrafikdesign/simplewebserial-arduino-library) which is installed on your Arduino device. Together, they allow you to write simple, event-driven code both in JavaScript and on the Arduino, enabling two-way communication.
 
 Under the hood, it uses the [Web Serial API](https://wicg.github.io/serial/). It handles repetitive setup steps and offers an event-driven style of listening to and sending data. The goal is to allow as many people as possible to explore the possibilities of connecting physical devices to web applications.
 
@@ -22,7 +22,7 @@ This library employs an event-driven code style. You can register event listener
 // Import
 
 // Set up the serial connection
-const connection = SimpleWebSerial.connect();
+const connection = SimpleWebSerial.connect({ requestAccessOnPageLoad: true });
 
 // React to incoming events
 connection.on('event-from-arduino', function(data) {

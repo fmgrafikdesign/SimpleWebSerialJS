@@ -21,18 +21,9 @@ void loop()
     float pitch = PI * 180.0 / PI;
     float roll  = PI * 180.0 / PI;
 
-    /*
-    float roll = atan2(imu.ay, imu.az);
-    float pitch = atan2(-imu.ax, sqrt(imu.ay * imu.ay + imu.az * imu.az));
-
-    // Convert everything from radians to degrees:
-    pitch *= 180.0 / PI;
-    roll  *= 180.0 / PI;
-    */
-    
     rotation["x"] = pitch;
     rotation["y"] = roll;
-    
+
     // Send the event with JSON variable as parameter to the web application
     WebSerial.send("r", rotation);
 

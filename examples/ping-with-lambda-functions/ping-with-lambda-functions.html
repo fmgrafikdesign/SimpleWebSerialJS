@@ -66,9 +66,12 @@
     const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true,
         logIncomingSerialData: true,
-        logOutgoingSerialData: true,
-    });
-    console.log(connection);
+    })
+
+    // Alternatively, we could prompt the user manually if the connection has not been set up yet:
+    // document.getElementById("ping").addEventListener('click', () => {
+    //     if (!connection.ready()) connection.startConnection();
+    // })
 
     let timestamp = null;
 
@@ -83,7 +86,7 @@
     // Again, we write our callback as an arrow function.
     connection.on("pong", pingNumber => {
         const rounded = Math.round((performance.now() - timestamp));
-        document.getElementById("pingback").innerText = "Pingback arrived after ~" + rounded + "ms [#" + pingNumber + "]";
+        document.getElementById("pingback").innerText = "Response arrived after ~" + rounded + "ms [#" + pingNumber + "]";
     })
 </script>
 </body>

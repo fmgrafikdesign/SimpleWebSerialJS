@@ -50,15 +50,17 @@
         };
 
         // Simple Serial Setup
-        const conn = SimpleWebSerial.connect();
+        const connection = SimpleWebSerial.setupSerialConnection({
+            requestAccessOnPageLoad: true,
+        });
 
         // Small average setup to reduce sensor jittering
         const averagex = new Array(10).fill(0);
         const averagey = new Array(10).fill(0);
         const average_count = 10;
         let i = 0;
-        // r is for 'rotation'. Keeping the event name short enables us to send it more often until event indexing is implemented.
-        conn.on("r", function (rotation) {
+        // r is for 'rotation'. Keeping the event name short enables us to send it more often.
+        connection.on("r", function (rotation) {
             console.log((new TextEncoder().encode(JSON.stringify(rotation))).length);
             // rotation is an object with the keys x and y for the x and y axis of rotation respectively.
             // They arrive from -180 to 180, and we'll map them to radians.
@@ -84,11 +86,10 @@
 
         animate();
     </script>
-
+</head>
 <body>
 <span id="explainer">Use a gyroscope to rotate the 3D model</span>
 </body>
-</head>
 <body>
 
 </body>

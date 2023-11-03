@@ -15,11 +15,11 @@
 <button id="request-access">Click to connect to Serial API</button>
 <div id="log"></div>
 <script>
-    const conn = SimpleWebSerial.connect({
-        requestButton: "request-access"
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestElement: "request-access"
     });
 
-    conn.on("log", function(data) {
+    connection.on("log", function(data) {
         document.getElementById("log").innerText = data + '\n' + document.getElementById("log").innerText;
     })
 </script>

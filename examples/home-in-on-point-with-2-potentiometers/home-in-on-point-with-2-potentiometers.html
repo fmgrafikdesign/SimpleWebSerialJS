@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Target Game</title>
     <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
-    <style type="text/css">
+    <style>
         html, body {
             background: rgb(24,24,24);
             color: #fff;
@@ -67,7 +67,9 @@
     const hor = document.getElementById("horizontal");
     const ver = document.getElementById("vertical");
     const target = document.getElementById("target");
-    const connection = SimpleWebSerial.connect();
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true,
+    });
 
     /* This handles connecting the bars to serial input */
     connection.on("v", number => hor.style.top = 2*number + "%")
