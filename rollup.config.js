@@ -1,8 +1,8 @@
-import { nodeResolve } from "@rollup/plugin-node-resolve";
-import { terser } from "rollup-plugin-terser";
-import babel from "@rollup/plugin-babel";
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+import { terser } from 'rollup-plugin-terser'
+import babel from '@rollup/plugin-babel'
 
-const input = ["src/index.js"];
+const input = ['src/index.js']
 export default [
     {
         // UMD
@@ -10,36 +10,36 @@ export default [
         plugins: [
             nodeResolve(),
             babel({
-                babelHelpers: "bundled",
+                babelHelpers: 'bundled',
             }),
             terser(),
         ],
         output: {
-            file: `dist/simple-web-serial.min.js`,
-            format: "umd",
-            name: "SimpleWebSerial", // this is the name of the global object
+            file: 'dist/simple-web-serial.min.js',
+            format: 'umd',
+            name: 'SimpleWebSerial', // this is the name of the global object
             esModule: false,
-            exports: "named",
+            exports: 'named',
             sourcemap: true,
         },
     },
-// ESM and CJS
+    // ESM and CJS
     {
         input,
         plugins: [nodeResolve()],
         output: [
             {
-                dir: "dist/esm",
-                format: "esm",
-                exports: "named",
+                dir: 'dist/esm',
+                format: 'esm',
+                exports: 'named',
                 sourcemap: true,
             },
             {
-                dir: "dist/cjs",
-                format: "cjs",
-                exports: "named",
+                dir: 'dist/cjs',
+                format: 'cjs',
+                exports: 'named',
                 sourcemap: true,
             },
         ],
     },
-];
+]

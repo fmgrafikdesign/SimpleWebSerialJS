@@ -45,7 +45,7 @@ const DEFAULT_CONSTRUCTOR_OBJECT = {
     baudRate: DEFAULT_BAUDRATE,
     requestElement: null,
     requestAccessOnPageLoad: false,
-    accessText: 'Please press this button to select the serial device you want to connect to.',
+    accessText: 'To access serial devices, user interaction is required. Please press this button to select the serial device you want to connect to.',
     accessButtonLabel: 'Choose device / port',
     styleDomElements: true,
     transformer: new LineBreakTransformer(),
@@ -122,6 +122,8 @@ function createConnectionInstance(configuration) {
     }
 
     async function startConnection() {
+        if (ready()) throw new Error('Serial connection has already been established.');
+
         try {
             port = await navigator.serial.requestPort({ filters: configuration.filters });
             await port.open({

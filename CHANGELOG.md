@@ -5,6 +5,7 @@ Breaking changes:
 - Renamed the global namespace from SimpleSerial to SimpleWebSerial
 - Renamed every occurrence of SimpleSerial to SimpleWebSerial, simple-serial to simple-web-serial etc.
 - Renamed most methods, most importantly `connect` has been renamed to `setupSerialConnection`
+- Renamed the `requestButton` constructor property to `requestElement`.
 - the `requestAccessOnPageLoad` property is now `false` by default. Set it to true if you want the library to show you the modal: `setupSerialConnect({ requestAcccessOnPageLoad: true })`
 
 Other changes:

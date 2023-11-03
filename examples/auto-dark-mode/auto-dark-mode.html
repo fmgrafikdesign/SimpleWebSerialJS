@@ -103,6 +103,7 @@
 </head>
 <body>
 <p id="text">Put your hand on the Light Dependent Resistor so no light can shine through. This web page will enter dark mode automatically!</p>
+<button>hi</button>
 <div class="background">
     <div class="stars"></div>
     <div class="twinkling"></div>
@@ -111,6 +112,8 @@
     const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true
     });
+
+    document.querySelector('button').addEventListener('click', connection.startConnection)
 
     connection.on("darkmode", function(isDarkmode) {
         if(isDarkmode) {
