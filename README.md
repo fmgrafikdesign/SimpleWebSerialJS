@@ -20,9 +20,10 @@ This library employs an event-driven code style. You can register event listener
 ### JavaScript
 ```javascript
 // Import
+import { setupSerialConnection } from 'simple-web-serial';
 
 // Set up the serial connection
-const connection = SimpleWebSerial.connect({ requestAccessOnPageLoad: true });
+const connection = setupSerialConnection({ requestAccessOnPageLoad: true });
 
 // React to incoming events
 connection.on('event-from-arduino', function(data) {
@@ -31,12 +32,10 @@ connection.on('event-from-arduino', function(data) {
 
 // Send named events to the Arduino with a number, string, array or json object
 connection.send('event-to-arduino', "Hello there, Arduino");
-
-// That's the basics!
 ```
 
 ### Arduino
-```c
+```cpp
 // Include the library
 #include <SimpleWebSerial.h>
 

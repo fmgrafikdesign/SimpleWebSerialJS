@@ -120,7 +120,7 @@ function createConnectionInstance(configuration) {
     }
 
     async function startConnection() {
-        if (ready()) throw new Error('Serial connection has already been established.');
+        if (ready()) throw new Error('Serial connection has already been established.')
 
         try {
             port = await navigator.serial.requestPort({ filters: configuration.filters })
