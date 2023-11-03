@@ -14,5 +14,5 @@ void loop() {
   char str[80];
   sprintf(str, "It has been %lu ms since Arduino has started this program!", millis());
   WebSerial.send("log", str);
-  delay(50);        // delay in between reads for stability
+  delay(50);        // delay in between writes for stability
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Simple Logger</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
         * {
             font-family: monospace;
@@ -15,11 +15,11 @@
 <button id="request-access">Click to connect to Serial API</button>
 <div id="log"></div>
 <script>
-    const conn = SimpleSerial.connect({
-        requestButton: "request-access"
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestElement: "request-access"
     });
 
-    conn.on("log", function(data) {
+    connection.on("log", function(data) {
         document.getElementById("log").innerText = data + '\n' + document.getElementById("log").innerText;
     })
 </script>

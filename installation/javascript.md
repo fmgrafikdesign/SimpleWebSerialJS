@@ -26,10 +26,10 @@ And include it in your project either by using a script tag:
 <script lang="text/javascript" src="../node_modules/simple-web-serial/dist/simple-serial.min.js">
 ```
 
-or with a bundler like webpack:
+or with a bundler like webpack or vite:
 
 ```javascript
-import { connect } from "simple-web-serial";
+import { setupSerialConnection } from "simple-web-serial";
 
-const connection = connect()
+const connection = setupSerialConnection ({ requestAccessOnPageLoad: true })
 ```

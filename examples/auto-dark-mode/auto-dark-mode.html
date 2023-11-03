@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Auto Dark Mode</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -95,7 +95,6 @@
             z-index:1;
 
             -moz-animation:move-twink-back 500s linear infinite;
-            -ms-animation:move-twink-back 500s linear infinite;
             -o-animation:move-twink-back 500s linear infinite;
             -webkit-animation:move-twink-back 500s linear infinite;
             animation:move-twink-back 500s linear infinite;
@@ -104,17 +103,20 @@
 </head>
 <body>
 <p id="text">Put your hand on the Light Dependent Resistor so no light can shine through. This web page will enter dark mode automatically!</p>
+<button>hi</button>
 <div class="background">
     <div class="stars"></div>
     <div class="twinkling"></div>
 </div>
 <script>
-    const conn = SimpleSerial.connect({
+    const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true
     });
 
-    conn.on("darkmode", function(darkmode) {
-        if(darkmode) {
+    document.querySelector('button').addEventListener('click', connection.startConnection)
+
+    connection.on("darkmode", function(isDarkmode) {
+        if(isDarkmode) {
             document.body.classList.add("dark-mode");
         } else {
             document.body.classList.remove("dark-mode");

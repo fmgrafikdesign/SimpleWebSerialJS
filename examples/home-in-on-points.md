@@ -20,7 +20,7 @@ description: A small game, use physical controls to home in on the dot!
 
 ### JavaScript
 
-The complete code for the game to work can be found [here](home-in-on-point-with-2-potentiometers/home-in-on-point-with-2-potentiometers.html). The code listed below is the code relevant to the communication between Arduino and your web application.
+The complete code for the game to work can be found [here](https://github.com/fmgrafikdesign/SimpleWebSerialJS/blob/main/examples/home-in-on-point-with-2-potentiometers/home-in-on-point-with-2-potentiometers.html). The code listed below is the code relevant to the communication between Arduino and your web application.
 
 * Two separate event listeners are created
 * Each listener receives a number from the Arduino
@@ -38,7 +38,7 @@ The complete code for the game to work can be found [here](home-in-on-point-with
    const hor = document.getElementById("horizontal");
    const ver = document.getElementById("vertical");
    
-   const connection = SimpleSerial.connect();
+   const connection = SimpleWebSerial.setupSerialConnection();
    /* This handles connecting the bars to serial input */
    connection.on("v", number => hor.style.top = 2*number + "%")
    connection.on("h", number => ver.style.left = 2*number + "%")

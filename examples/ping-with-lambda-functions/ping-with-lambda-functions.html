@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Logger</title>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
+    <style>
+        .ping-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #pingback {
+            margin-top: 80px;
+            color: #ffffff;
+        }
+
+        /* nice button CSS - modified from https://codepen.io/alexandrevale/pen/ZMxQJp (c) Alexandro do Vale */
+        .btn {
+            padding: 15px;
+            font-weight: 700;
+            font-size: 2rem;
+            text-decoration: none;
+            text-align: center;
+            transition: all .15s ease;
+            cursor: pointer;
+            width: 320px;
+            margin: auto;
+        }
+
+        body {
+            font-family: monospace;
+            font-size: 32px;
+            line-height: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            background: #9d3254;
+        }
+
+        .btn--action{
+            display: block;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            background-color: #f6e58d;
+            border-color: rgba(246, 201, 42, 0.23);
+            color: #000;
+            box-shadow: 0 10px #f9ca24;
+        }
+
+        .btn--action:active {
+            box-shadow: 0 5px #f0932b;
+            transform: translateY(5px);
+        }
+    </style>
+</head>
+<body>
+<div class="ping-wrapper">
+    <button class="btn btn--action" id="ping">Ping!</button>
+    <div id="pingback">Press the button to send out your first ping.</div>
+</div>
+<script>
+    // To save us set up time, we let the library handle requesting access to the Web Serial API
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true,
+        logIncomingSerialData: true,
+    })
+
+    // Alternatively, we could prompt the user manually if the connection has not been set up yet:
+    // document.getElementById("ping").addEventListener('click', () => {
+    //     if (!connection.ready()) connection.startConnection();
+    // })
+
+    let timestamp = null;
+
+    // When we click on the ping button, send the event "ping" to the Arduino.
+    // We use an arrow function here as our callback, just to write a few less characters.
+    document.getElementById("ping").addEventListener("click", () => {
+        timestamp = performance.now();
+        connection.send("ping", 0);
+    })
+
+    // When we receive the "pong" event, show how long it took.
+    // Again, we write our callback as an arrow function.
+    connection.on("pong", pingNumber => {
+        const rounded = Math.round((performance.now() - timestamp));
+        document.getElementById("pingback").innerText = "Response arrived after ~" + rounded + "ms [#" + pingNumber + "]";
+    })
+</script>
+</body>
+</html>

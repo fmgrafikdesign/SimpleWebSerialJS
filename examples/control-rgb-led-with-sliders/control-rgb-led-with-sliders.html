@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Library - Control Background Color with Arduino</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -104,10 +104,12 @@
     </div>
 </div>
 <script type="text/javascript">
-    const port = SimpleSerial.connect();
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true,
+    });
     const log = document.getElementById('log');
 
-    port.on('hexadecimal', (value) => {
+    connection.on('hexadecimal', (value) => {
         log.innerText = value;
     });
 
@@ -121,7 +123,7 @@
         const b = document.getElementById('blue').value
 
         let rgb = {r, g, b}
-        await port.send("values", rgb);
+        await connection.send("values", rgb);
     }
 </script>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Simple Logger with Reset</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
         * {
             font-family: monospace;
@@ -16,18 +16,17 @@
 <button id="reset-button">Reset the counter!</button>
 <div id="log"></div>
 <script>
-    const conn = SimpleSerial.connect({
-        requestButton: "request-access",
-        requestAccessOnPageLoad: false
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestElement: "request-access",
     });
 
     // When we click on the reset button, send the "reset" event to the Arduino.
     document.getElementById("reset-button").addEventListener("click", function () {
-        conn.sendEvent("reset");
+        connection.sendEvent("reset");
     })
 
     // When we receive the "log" event, append the log to the logging element.
-    conn.on("log", function(data) {
+    connection.on("log", function(data) {
         document.getElementById("log").innerText = data + '\n' + document.getElementById("log").innerText;
     })
 </script>

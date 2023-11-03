@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Simple Plotter</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -59,11 +59,13 @@
     const graph = document.getElementById("graph");
     let frameCount = 0;
 
-    const conn = SimpleSerial.connect();
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true,
+    });
     let value = 0;
 
     // Register callback that listens to pure, unnamed data
-    conn.on("data", function(data) {
+    connection.on("data", function(data) {
         value = data;
     })
 

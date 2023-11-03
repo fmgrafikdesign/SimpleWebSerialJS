@@ -15,6 +15,7 @@
 
 ## Examples
 
+* [Examples](examples/examples.md)
 * [Auto Dark Mode](examples/auto-dark-mode.md)
 * [Home in on points](examples/home-in-on-points.md)
 * [\[WIP\] Ping Test - Lambda function](examples/ping-test-lambda-function.md)

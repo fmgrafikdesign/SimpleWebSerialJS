@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Control LEDs With Mouse Position</title>
-    <script lang="text/javascript" src="../../dist/simple-serial.min.js"></script>
+    <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
 </head>
 <body>
 
 <script>
-    const conn = SimpleSerial.connect();
+    const connection = SimpleWebSerial.setupSerialConnection({
+        requestAccessOnPageLoad: true
+    });
 
     window.addEventListener("mousemove", event => {
         const { clientX, clientY } = event;
         const x = Math.floor(255 * clientX / window.innerWidth)
         const y = Math.floor(255 * clientY / window.innerHeight)
-        conn.send("p", [x,y])
+        connection.send("p", [x,y])
     })
 </script>
 
