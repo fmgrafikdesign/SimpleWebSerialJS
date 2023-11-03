@@ -76,3 +76,9 @@ This library is for creative minds and developers who like to experiment and cre
 Do you know your way around web development? Basic concepts like HTML, JavaScript? Then you can use this without problems.
 
 Do you like experimenting with new web technologies, maybe learn a new thing or two? This library will give you an idea what's possible when we integrate websites with the real world.
+
+## Getting Started
+
+Get started by installing the JavaScript library and the Arduino library. You can find a quick setup in the [documentation](https://fmgrafikdesign.gitbook.io/simplewebserial/).
+
+Alternatively you can check out the repository and have a look at the examples folder. Be aware, you will need an Arduino for all of them, and some parts (LEDs, potentiometer etc) for most of them.
