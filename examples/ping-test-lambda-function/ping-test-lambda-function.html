@@ -15,22 +15,17 @@
             color: #ffffff;
         }
 
-        /* nice button CSS - by Alex Hart, https://codepen.io/ahart814/pen/yLNMZGa */
-        :root {
-            --backgroundColor: rgb(62, 39, 48);
-            --colorShadeA: rgb(163, 106, 106);
-            --colorShadeB: rgb(186, 121, 151);
-            --colorShadeC: rgb(232, 150, 173);
-            --colorShadeD: rgb(232, 187, 201);
-            --colorShadeE: rgb(255, 205, 221);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        *::before, *::after {
-            box-sizing: border-box;
+        /* nice button CSS - modified from https://codepen.io/alexandrevale/pen/ZMxQJp (c) Alexandro do Vale */
+        .btn {
+            padding: 15px;
+            font-weight: 700;
+            font-size: 2rem;
+            text-decoration: none;
+            text-align: center;
+            transition: all .15s ease;
+            cursor: pointer;
+            width: 320px;
+            margin: auto;
         }
 
         body {
@@ -42,80 +37,38 @@
             justify-content: center;
             margin: 0;
             min-height: 100vh;
-            background: var(--backgroundColor);
+            background: #9d3254;
         }
 
-        button {
-            position: relative;
+        .btn--action{
             display: block;
-            cursor: pointer;
-            outline: none;
-            border: 0;
-            vertical-align: middle;
-            text-decoration: none;
-            font-size: 1.5rem;
-            color: var(--colorShadeA);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-family: inherit;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            background-color: #f6e58d;
+            border-color: rgba(246, 201, 42, 0.23);
+            color: #000;
+            box-shadow: 0 10px #f9ca24;
         }
 
-        button.big-button {
-            padding: 1em 2em;
-            border: 2px solid var(--colorShadeA);
-            border-radius: 1em;
-            background: var(--colorShadeE);
-            transform-style: preserve-3d;
-            transition: all 175ms cubic-bezier(0, 0, 1, 1);
-        }
-
-        button.big-button::before {
-            position: absolute;
-            content: '';
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--colorShadeC);
-            border-radius: inherit;
-            box-shadow: 0 0 0 2px var(--colorShadeB), 0 0.75em 0 0 var(--colorShadeA);
-            transform: translate3d(0, 0.75em, -1em);
-            transition: all 175ms cubic-bezier(0, 0, 1, 1);
-        }
-
-
-        button.big-button:hover {
-            background: var(--colorShadeD);
-            transform: translate(0, 0.375em);
-        }
-
-        button.big-button:hover::before {
-            transform: translate3d(0, 0.75em, -1em);
-        }
-
-        button.big-button:active {
-            transform: translate(0em, 0.75em);
-        }
-
-        button.big-button:active::before {
-            transform: translate3d(0, 0, -2em);
-            box-shadow: 0 0 0 2px var(--colorShadeB), 0 0.25em 0 0 var(--colorShadeB);
+        .btn--action:active {
+            box-shadow: 0 5px #f0932b;
+            transform: translateY(5px);
         }
     </style>
 </head>
 <body>
 <div class="ping-wrapper">
-    <button class="big-button" id="ping">Ping!</button>
+    <button class="btn btn--action" id="ping">Ping!</button>
     <div id="pingback">Press the button to send out your first ping.</div>
 </div>
 <script>
     // To save us set up time, we let the library handle requesting access to the Web Serial API
-    const conn = SimpleWebSerial.connect({
+    const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true,
-        logIncomingSerialData: true
+        logIncomingSerialData: true,
+        logOutgoingSerialData: true,
     });
+    console.log(connection);
 
     let timestamp = null;
 
@@ -123,12 +76,12 @@
     // We use an arrow function here as our callback, just to write a few less characters.
     document.getElementById("ping").addEventListener("click", () => {
         timestamp = performance.now();
-        conn.send("ping", 0);
+        connection.send("ping", 0);
     })
 
     // When we receive the "pong" event, show how long it took.
     // Again, we write our callback as an arrow function.
-    conn.on("pong", pingNumber => {
+    connection.on("pong", pingNumber => {
         const rounded = Math.round((performance.now() - timestamp));
         document.getElementById("pingback").innerText = "Pingback arrived after ~" + rounded + "ms [#" + pingNumber + "]";
     })

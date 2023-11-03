@@ -1,1 +1,1 @@
-export { default as SimpleWebSerial } from './SimpleWebSerial'
+export { default as setupSerialConnection } from './SimpleWebSerial'

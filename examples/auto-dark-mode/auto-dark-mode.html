@@ -109,12 +109,12 @@
     <div class="twinkling"></div>
 </div>
 <script>
-    const conn = SimpleWebSerial.connect({
+    const connection = SimpleWebSerial.setupSerialConnection({
         requestAccessOnPageLoad: true
     });
 
-    conn.on("darkmode", function(darkmode) {
-        if(darkmode) {
+    connection.on("darkmode", function(isDarkmode) {
+        if(isDarkmode) {
             document.body.classList.add("dark-mode");
         } else {
             document.body.classList.remove("dark-mode");
