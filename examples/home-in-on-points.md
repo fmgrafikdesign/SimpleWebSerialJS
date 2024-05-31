@@ -28,7 +28,7 @@ The complete code for the game to work can be found [here](https://github.com/fm
 
 ```javascript
 <head>
-   <script lang="text/javascript" src="https://unpkg.com/simple-web-serial@latest/dist/simple-serial.min.js"></script>
+   <script lang="text/javascript" src="https://unpkg.com/simple-web-serial@latest/dist/simple-web-serial.min.js"></script>
 </head>
 
 <div id="horizontal"></div>
