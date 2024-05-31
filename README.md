@@ -1,11 +1,12 @@
-
+---
+description: >-
+  SimpleWebSerial helps you to connect an Arduino with your web application, in
+  seconds.
+---
 
 # Introduction
 
-SimpleWebSerial helps you to connect an Arduino with your web application, in
-seconds. Get started now by taking a look at the [documentation](https://fmgrafikdesign.gitbook.io/simplewebserial/)! This is the JavaScript part of the project. You can find the Arduino part [here](https://github.com/fmgrafikdesign/simplewebserial-arduino-library).
-
-<img src=".gitbook/assets/titelbild-v4.jpg" alt="A graphic visualising the event-driven architecture of the project">
+<figure><img src=".gitbook/assets/titelbild-v4.jpg" alt=""><figcaption></figcaption></figure>
 
 ## What is this library?
 
@@ -18,8 +19,8 @@ Under the hood, it uses the [Web Serial API](https://wicg.github.io/serial/). It
 This library employs an event-driven code style. You can register event listeners with callback functions, and send events to the other device. Here's a brief idea how working with the library looks like in the browser and on the Arduino:
 
 ### JavaScript
+
 ```javascript
-// Import
 import { setupSerialConnection } from 'simple-web-serial';
 
 // Set up the serial connection
@@ -35,17 +36,13 @@ connection.send('event-to-arduino', "Hello there, Arduino");
 ```
 
 ### Arduino
+
 ```cpp
 // Include the library
 #include <SimpleWebSerial.h>
 
 // Create an instance of the library
 SimpleWebSerial WebSerial;
-
-void eventCallback(JSONVar data) {
-    // Do something, even sending events right back!
-    WebSerial.send("event-from-arduino", data);
-}
 
 void setup() {
   // Initialize serial communication
@@ -57,6 +54,11 @@ void setup() {
   // Send named events to browser with a number, string, array or json object
   WebSerial.send("event-from-arduino", 123);
 }
+
+void eventCallback(JSONVar data) {
+    // Do something, even sending events right back!
+    WebSerial.send("event-from-arduino", data);
+});
 
 void loop() {
   // Check for new serial data every loop
@@ -79,6 +81,4 @@ Do you like experimenting with new web technologies, maybe learn a new thing or 
 
 ## Getting Started
 
-Get started by installing the JavaScript library and the Arduino library. You can find a quick setup in the [documentation](https://fmgrafikdesign.gitbook.io/simplewebserial/).
-
-Alternatively you can check out the repository and have a look at the examples folder. Be aware, you will need an Arduino for all of them, and some parts (LEDs, potentiometer etc) for most of them.
+Get started by installing the [JavaScript library](https://github.com/fmgrafikdesign/SimpleWebSerialJS) and the [Arduino library](https://github.com/fmgrafikdesign/simplewebserial-arduino-library). Alternatively you can check out the repository and have a look at the [examples](https://github.com/fmgrafikdesign/SimpleWebSerialJS/tree/main/examples) folder. Be aware, you will need an Arduino for all of them, and some hardware parts (LEDs, potentiometer etc) for most of them.

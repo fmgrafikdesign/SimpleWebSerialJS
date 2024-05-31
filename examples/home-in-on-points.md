@@ -80,4 +80,4 @@ void loop() {
 
 The image below is from running the [complete example](https://github.com/fmgrafikdesign/SimpleWebSerialJS/tree/main/examples/home-in-on-point-with-2-potentiometers).
 
-![](../.gitbook/assets/image.png)
+![](<../.gitbook/assets/image (1).png>)

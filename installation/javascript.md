@@ -23,7 +23,7 @@ npm i simple-web-serial
 And include it in your project either by using a script tag:
 
 ```markup
-<script lang="text/javascript" src="../node_modules/simple-web-serial/dist/simple-web-serial.min.js">
+<script lang="text/javascript" src="../node_modules/simple-web-serial/dist/simple-serial.min.js">
 ```
 
 or with a bundler like webpack or vite:
