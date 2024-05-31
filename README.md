@@ -42,6 +42,11 @@ connection.send('event-to-arduino', "Hello there, Arduino");
 // Create an instance of the library
 SimpleWebSerial WebSerial;
 
+void eventCallback(JSONVar data) {
+    // Do something, even sending events right back!
+    WebSerial.send("event-from-arduino", data);
+}
+
 void setup() {
   // Initialize serial communication
   Serial.begin(57600);
@@ -52,11 +57,6 @@ void setup() {
   // Send named events to browser with a number, string, array or json object
   WebSerial.send("event-from-arduino", 123);
 }
-
-void eventCallback(JSONVar data) {
-    // Do something, even sending events right back!
-    WebSerial.send("event-from-arduino", data);
-});
 
 void loop() {
   // Check for new serial data every loop
