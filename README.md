@@ -5,7 +5,7 @@
 SimpleWebSerial helps you to connect an Arduino with your web application, in
 seconds. Get started now by taking a look at the [documentation](https://fmgrafikdesign.gitbook.io/simplewebserial/)! This is the JavaScript part of the project. You can find the Arduino part [here](https://github.com/fmgrafikdesign/simplewebserial-arduino-library).
 
-<img src=".gitbook/assets/titelbild-v4.jpg" alt="A graphic visualising the event-driven architecture of the project">
+<img src="docs/.gitbook/assets/titelbild-v4.jpg" alt="A graphic visualising the event-driven architecture of the project">
 
 ## What is this library?
 
