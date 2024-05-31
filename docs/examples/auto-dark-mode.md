@@ -25,7 +25,7 @@ description: >-
 
 The complete code for the example can be found [here](https://github.com/fmgrafikdesign/SimpleWebSerialJS/blob/main/examples/auto-dark-mode/auto-dark-mode.html). The code listed below is enough to make the example work, but it's not quite as pretty as the full example.
 
-```markup
+```html
 <head>
     <script lang="text/javascript" src="../../dist/simple-web-serial.min.js"></script>
 </head>

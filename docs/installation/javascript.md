@@ -8,7 +8,7 @@ description: How to set up the JavaScript part of the SimpleWebSerial library.
 
 This is the easiest method to get you started immediately. Just include the script tag inside the `<head>` of your document and you're good to go:
 
-```markup
+```html
 <script lang="text/javascript" src="https://unpkg.com/simple-web-serial@latest/dist/simple-web-serial.min.js"></script>
 ```
 
@@ -16,13 +16,13 @@ That's it! Either [set-up the Arduino Library](arduino.md) as well, or take a lo
 
 ## Via npm
 
-```javascript
+```bash
 npm i simple-web-serial
 ```
 
 And include it in your project either by using a script tag:
 
-```markup
+```html
 <script lang="text/javascript" src="../node_modules/simple-web-serial/dist/simple-serial.min.js">
 ```
 
