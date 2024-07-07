@@ -17,7 +17,7 @@
 
     async function toggleLED() {
         const byte = (toggle = !toggle) ? 0 : 1
-        connection.sendEvent('led', byte);
+        connection.send('led', byte);
     }
 </script>
 

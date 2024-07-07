@@ -16,7 +16,7 @@ void loop() {
   outputValue = map(sensorValue, 0, 1023, 0, 255);
 
   // print the results to the Serial Monitor:
-  SerialWebLibrary.sendEvent("backgroundColor", outputValue);
+  SerialWebLibrary.send("backgroundColor", outputValue);
 
   // wait 2 milliseconds before the next loop for the analog-to-digital
   // converter to settle after the last reading:
