@@ -2,7 +2,7 @@
 
 ## Basics
 
-To use the library, store an instance of it in a variable by calling its connect method.
+To use the library, store an instance of it in a variable by calling its `setupSerialConnection` method.
 
 If you've included the library via \<script> tag:
 
@@ -61,9 +61,9 @@ When creating a SimpleWebSerial instance, it has a default set-up that works out
 **Example:**
 
 ```javascript
-const conn  = SimpleWebSerial.connect(); // Default, out-of-the-box behavior
-const conn2 = SimpleWebSerial.connect(9600); // Connect with a lower connection speed
-const conn3 = SimpleWebSerial.connect({ // Connection with a custom constructor object
+const conn  = SimpleWebSerial.setupSerialConnection(); // Default, out-of-the-box behavior
+const conn2 = SimpleWebSerial.setupSerialConnection(9600); // Connect with a lower connection speed
+const conn3 = SimpleWebSerial.setupSerialConnection({ // Connection with a custom constructor object
     baudRate: 9600,
     requestAccessOnPageLoad: true,
 });
