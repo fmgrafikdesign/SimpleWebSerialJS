@@ -55,10 +55,10 @@ function parseAsNumber(value) {
     if ('number' == typeof value) return value;
     if ('string' == typeof value && !isNaN(value) && '' !== value.trim()) return parseFloat(value);
     if (Array.isArray(value)) return value.map((item)=>parseAsNumber(item));
-    if ('object' == typeof value && null !== value) return Object.keys(value).reduce((acc, key)=>({
-            ...acc,
-            [key]: parseAsNumber(value[key])
-        }), {});
+    if ('object' == typeof value && null !== value) return Object.keys(value).reduce((acc, key)=>{
+        acc[key] = parseAsNumber(value[key]);
+        return acc;
+    }, {});
     return value;
 }
 function createDefaultConstructorObject() {
