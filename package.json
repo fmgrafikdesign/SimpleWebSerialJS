@@ -1,20 +1,29 @@
 {
   "name": "simple-web-serial",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Connect an Arduino with your web application, in seconds. Use an event-driven approach and take advantage of a pre-configured web serial api setup routine.",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "keywords": [
+    "serial port",
+    "web serial api",
+    "simple web serial",
+    "simple-web-serial",
+    "SimpleWebSerialJS"
+  ],
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.mjs",
   "files": [
     "dist",
     "examples"
   ],
   "directories": {
-    "example": "examples",
-    "lib": "lib"
+    "example": "examples"
   },
   "scripts": {
-    "dev": "rollup -c -w",
-    "build": "rollup -c"
+    "dev": "rslib build --watch",
+    "build": "rslib build",
+    "test": "vitest",
+    "test:unit": "vitest unit",
+    "test:build": "vitest build"
   },
   "repository": {
     "type": "git",
@@ -27,18 +36,13 @@
   },
   "homepage": "https://github.com/fmgrafikdesign/SimpleWebSerialJS#readme",
   "devDependencies": {
-    "@babel/core": "^7.13.10",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/plugin-transform-runtime": "^7.13.10",
-    "@babel/preset-env": "^7.13.12",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.2.0",
+    "@rslib/core": "^0.1.4",
     "eslint": "^8.52.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-n": "^16.2.0",
     "eslint-plugin-promise": "^6.1.1",
-    "rollup": "^2.42.4",
-    "rollup-plugin-terser": "^7.0.2"
+    "jsdom": "^25.0.1",
+    "vitest": "^2.1.8"
   }
 }

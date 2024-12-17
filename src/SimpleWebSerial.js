@@ -1,6 +1,6 @@
 'use strict'
 
-const DEFAULT_BAUDRATE = 57600
+export const DEFAULT_BAUDRATE = 57600
 
 // Simple TransformStream used to chop incoming serial data up when a new line character appears.
 class LineBreakTransformer {
@@ -28,31 +28,35 @@ class LineBreakTransformer {
     }
 }
 
-function parseAsNumber(value) {
-    if (typeof value === 'number') return value
-    if (typeof value === 'string' && !isNaN(value)) return parseFloat(value)
-    if (Array.isArray(value)) return value.map(item => parseAsNumber(item))
-    if (typeof value === 'object') return Object.keys(value).reduce((acc, key) => ({
-        ...acc,
-        [key]: parseAsNumber(value[key])
-    }), {})
-    return value
+export function parseAsNumber(value) {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string' && !isNaN(value) && value.trim() !== '') return parseFloat(value);
+    if (Array.isArray(value)) return value.map(item => parseAsNumber(item));
+    if (typeof value === 'object' && value !== null) {
+        return Object.keys(value).reduce((acc, key) => ({
+            ...acc,
+            [key]: parseAsNumber(value[key])
+        }), {});
+    }
+    return value;
 }
 
-const DEFAULT_CONSTRUCTOR_OBJECT = {
-    baudRate: DEFAULT_BAUDRATE,
-    requestElement: null,
-    requestAccessOnPageLoad: false,
-    accessText: 'To access serial devices, user interaction is required. Please press this button to select the serial device you want to connect to.',
-    accessButtonLabel: 'Choose device / port',
-    styleDomElements: true,
-    transformer: new LineBreakTransformer(),
-    logIncomingSerialData: false,
-    logOutgoingSerialData: false,
-    parseStringsAsNumbers: true,
-    warnAboutUnregisteredEvents: true,
-    newLineCharacter: '\n',
-    filters: []
+export function createDefaultConstructorObject() {
+    return {
+        baudRate: DEFAULT_BAUDRATE,
+        requestElement: null,
+        requestAccessOnPageLoad: false,
+        accessText: 'To access serial devices, user interaction is required. Please press this button to select the serial device you want to connect to.',
+        accessButtonLabel: 'Choose device / port',
+        styleDomElements: true,
+        transformer: new LineBreakTransformer(),
+        logIncomingSerialData: false,
+        logOutgoingSerialData: false,
+        parseStringsAsNumbers: true,
+        warnAboutUnregisteredEvents: true,
+        newLineCharacter: '\n',
+        filters: []
+    }
 }
 
 function createConnectionInstance(configuration) {
@@ -239,10 +243,11 @@ function createConnectionInstance(configuration) {
     }
 
     function emit(name, data) {
-        if (configuration.warnAboutUnregisteredEvents && !_listeners[name]) {
+        if (_listeners[name]) {
+            _listeners[name].forEach(callback => callback(data))
+        } else if(configuration.warnAboutUnregisteredEvents) {
             return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.')
         }
-        _listeners[name].forEach(callback => callback(data))
     }
 
     async function readLoop(reader) {
@@ -304,12 +309,26 @@ function createConnectionInstance(configuration) {
         }
     }
 
+    function getPort() {
+        return port;
+    }
+
+    function getWriter() {
+        return writer;
+    }
+
+    function setWriter(newWriter) {
+        writer = newWriter;
+        return writer;
+    }
+
     return {
+        configuration,
         createModal,
         emit,
         modalElement,
         on,
-        port,
+        getPort,
         ready,
         readable,
         removeListener,
@@ -321,6 +340,8 @@ function createConnectionInstance(configuration) {
         startConnection,
         writable,
         writer,
+        getWriter,
+        setWriter,
     }
 }
 
@@ -331,16 +352,16 @@ export const setupSerialConnection = function (args) {
 
     if (typeof args === 'number') {
         args = {
-            ...DEFAULT_CONSTRUCTOR_OBJECT,
+            ...createDefaultConstructorObject(),
             baudRate: args
         }
     } else if (typeof args === 'undefined') {
-        args = DEFAULT_CONSTRUCTOR_OBJECT
+        args = createDefaultConstructorObject()
     } else if (typeof args === 'object') {
 
         // constructor object, override defaults
         args = {
-            ...DEFAULT_CONSTRUCTOR_OBJECT,
+            ...createDefaultConstructorObject(),
             ...args
         }
     }
@@ -368,4 +389,3 @@ export const setupSerialConnection = function (args) {
 
     return instance
 }
-export default setupSerialConnection
