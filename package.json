@@ -12,9 +12,10 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.mjs",
   "files": [
-    "dist",
-    "README.md",
-    "CHANGELOG.md"
+    "./dist",
+    "./README.md",
+    "./CHANGELOG.md",
+    "./docs/.gitbook/assets/titelbild-v4.jpg"
   ],
   "directories": {
     "example": "examples"
