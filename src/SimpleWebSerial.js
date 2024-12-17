@@ -33,10 +33,10 @@ export function parseAsNumber(value) {
     if (typeof value === 'string' && !isNaN(value) && value.trim() !== '') return parseFloat(value);
     if (Array.isArray(value)) return value.map(item => parseAsNumber(item));
     if (typeof value === 'object' && value !== null) {
-        return Object.keys(value).reduce((acc, key) => ({
-            ...acc,
-            [key]: parseAsNumber(value[key])
-        }), {});
+        return Object.keys(value).reduce((acc, key) => {
+            acc[key] = parseAsNumber(value[key]);
+            return acc;
+        }, {});
     }
     return value;
 }
