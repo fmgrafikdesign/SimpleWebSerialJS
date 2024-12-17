@@ -1,3 +1,14 @@
+# 1.2.0
+
+- Switch to rslib for bundling the library
+- Change the dist path for cjs to `dist/index.cjs.js`
+- Change the dist path for ESM to `dist/esm.mjs`
+- Update package.json to reflect the changed dist paths for cjs and esm accordingly
+- Change linting rules a bit
+
+# 1.0.1 + 1.1.0 + 1.1.1
+
+- I forgot doing a changelog for this and can't remember, I'm sorry. :(
 
 # 1.0.0
 
