@@ -13,7 +13,8 @@
   "module": "dist/index.esm.mjs",
   "files": [
     "dist",
-    "examples"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "directories": {
     "example": "examples"
