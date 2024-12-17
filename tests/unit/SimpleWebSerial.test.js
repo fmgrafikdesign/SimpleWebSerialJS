@@ -4,13 +4,13 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setupSerialConnection } from '../../src';
-import {MockWebSerialAPI} from "./__mocks__/MockWebSerialAPI";
-import {createDefaultConstructorObject} from "../../src/SimpleWebSerial";
+import {MockWebSerialAPI} from './__mocks__/MockWebSerialAPI';
+import {createDefaultConstructorObject} from '../../src/SimpleWebSerial';
 // Import the mock implementation
 
 // Mock the navigator.serial API
 beforeEach(() => {
-    Object.defineProperty(global.navigator, 'serial', {
+    Object.defineProperty(window.navigator, 'serial', {
         value: new MockWebSerialAPI(),
         configurable: true, // Allow redefining for different tests
     });

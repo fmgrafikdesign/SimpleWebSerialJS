@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 test('UMD: Library and its functions are available after loading it via script tag', async () => {
-    const dom = new JSDOM(`<!DOCTYPE html><body></body>`, {
+    const dom = new JSDOM('<!DOCTYPE html><body></body>', {
         runScripts: 'dangerously', // Allows executing scripts
         resources: 'usable', // Loads external resources
     });

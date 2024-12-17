@@ -23,29 +23,31 @@ class LineBreakTransformer {
 }
 function parseAsNumber(value) {
     if ('number' == typeof value) return value;
-    if ('string' == typeof value && !isNaN(value)) return parseFloat(value);
+    if ('string' == typeof value && !isNaN(value) && '' !== value.trim()) return parseFloat(value);
     if (Array.isArray(value)) return value.map((item)=>parseAsNumber(item));
-    if ('object' == typeof value) return Object.keys(value).reduce((acc, key)=>({
+    if ('object' == typeof value && null !== value) return Object.keys(value).reduce((acc, key)=>({
             ...acc,
             [key]: parseAsNumber(value[key])
         }), {});
     return value;
 }
-const DEFAULT_CONSTRUCTOR_OBJECT = {
-    baudRate: DEFAULT_BAUDRATE,
-    requestElement: null,
-    requestAccessOnPageLoad: false,
-    accessText: 'To access serial devices, user interaction is required. Please press this button to select the serial device you want to connect to.',
-    accessButtonLabel: 'Choose device / port',
-    styleDomElements: true,
-    transformer: new LineBreakTransformer(),
-    logIncomingSerialData: false,
-    logOutgoingSerialData: false,
-    parseStringsAsNumbers: true,
-    warnAboutUnregisteredEvents: true,
-    newLineCharacter: '\n',
-    filters: []
-};
+function createDefaultConstructorObject() {
+    return {
+        baudRate: DEFAULT_BAUDRATE,
+        requestElement: null,
+        requestAccessOnPageLoad: false,
+        accessText: 'To access serial devices, user interaction is required. Please press this button to select the serial device you want to connect to.',
+        accessButtonLabel: 'Choose device / port',
+        styleDomElements: true,
+        transformer: new LineBreakTransformer(),
+        logIncomingSerialData: false,
+        logOutgoingSerialData: false,
+        parseStringsAsNumbers: true,
+        warnAboutUnregisteredEvents: true,
+        newLineCharacter: '\n',
+        filters: []
+    };
+}
 function createConnectionInstance(configuration) {
     let port = null;
     let writer = null;
@@ -183,8 +185,8 @@ function createConnectionInstance(configuration) {
         return send('_d', data);
     }
     function emit(name, data) {
-        if (configuration.warnAboutUnregisteredEvents && !_listeners[name]) return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
-        _listeners[name].forEach((callback)=>callback(data));
+        if (_listeners[name]) _listeners[name].forEach((callback)=>callback(data));
+        else if (configuration.warnAboutUnregisteredEvents) return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
     }
     async function readLoop(reader) {
         while(true){
@@ -224,12 +226,23 @@ function createConnectionInstance(configuration) {
             }
         }
     }
+    function getPort() {
+        return port;
+    }
+    function getWriter() {
+        return writer;
+    }
+    function setWriter(newWriter) {
+        writer = newWriter;
+        return writer;
+    }
     return {
+        configuration,
         createModal,
         emit,
         modalElement,
         on,
-        port,
+        getPort,
         ready,
         readable,
         removeListener,
@@ -240,18 +253,20 @@ function createConnectionInstance(configuration) {
         sendEvent,
         startConnection,
         writable,
-        writer
+        writer,
+        getWriter,
+        setWriter
     };
 }
 const setupSerialConnection = function(args) {
     if (!navigator.serial) throw new Error('The Serial API not supported in your browser. Make sure you\'ve enabled flags if necessary!');
     if ('number' == typeof args) args = {
-        ...DEFAULT_CONSTRUCTOR_OBJECT,
+        ...createDefaultConstructorObject(),
         baudRate: args
     };
-    else if (void 0 === args) args = DEFAULT_CONSTRUCTOR_OBJECT;
+    else if (void 0 === args) args = createDefaultConstructorObject();
     else if ('object' == typeof args) args = {
-        ...DEFAULT_CONSTRUCTOR_OBJECT,
+        ...createDefaultConstructorObject(),
         ...args
     };
     if (null != args.requestElement) args = {
