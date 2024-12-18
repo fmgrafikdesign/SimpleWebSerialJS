@@ -1,3 +1,7 @@
+# 1.3.1
+
+- fix: Add examples folder back to distributed files
+
 # 1.3.0
 
 - feat: Rewrite library in Typescript
