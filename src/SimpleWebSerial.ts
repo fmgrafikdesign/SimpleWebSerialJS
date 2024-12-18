@@ -1,8 +1,5 @@
-// TypeScript Version of the Library with Type Definitions
-
 export const DEFAULT_BAUDRATE = 57600;
 
-// Interface for the connection configuration
 interface ConnectionConfiguration {
     baudRate: number;
     requestElement: HTMLElement | string | null;
@@ -33,12 +30,10 @@ interface JsonObject {
 
 type JsonArray = Array<JsonValue>;
 
-// Type definitions for listener callbacks
 type ListenerCallback = (data: JsonValue) => void;
 type Listener = [string, ListenerCallback];
 type Listeners = Record<string, ListenerCallback[]>;
 
-// LineBreakTransformer class implementing the Transformer interface
 class LineBreakTransformer implements Transformer<string, string> {
     private chunks: string;
 
@@ -84,7 +79,7 @@ export function parseAsNumber(value: JsonValue): JsonValue {
     return value;
 }
 
-// Function to create the default configuration object
+// Factory function to create the default configuration object
 export function createDefaultConstructorObject(): ConnectionConfiguration {
     return {
         baudRate: DEFAULT_BAUDRATE,
@@ -105,7 +100,7 @@ export function createDefaultConstructorObject(): ConnectionConfiguration {
 }
 
 // Class representing the serial connection
-class SerialConnection {
+export class SerialConnection {
     private port: SerialPort | null = null;
     private writer: WritableStreamDefaultWriter<string> | null = null;
     private _modalElement: HTMLElement | null = null;

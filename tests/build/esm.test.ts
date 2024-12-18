@@ -1,4 +1,5 @@
 import { test, expect } from 'vitest';
+// @ts-expect-error don't care for missing declaration file for test
 import { setupSerialConnection } from '../../dist/index.esm.mjs';
 
 test('ESM: setupSerialConnection should be defined', () => {

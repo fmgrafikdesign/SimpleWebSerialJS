@@ -5,8 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setupSerialConnection } from '../../src';
 import {MockWebSerialAPI} from './__mocks__/MockWebSerialAPI';
-import {createDefaultConstructorObject} from '../../src/SimpleWebSerial';
-// Import the mock implementation
+import {createDefaultConstructorObject, type SerialConnection} from '../../src/SimpleWebSerial';
 
 // Mock the navigator.serial API
 beforeEach(() => {
@@ -24,7 +23,8 @@ const mockButtonElement = {
 // Mock document.getElementById
 vi.spyOn(document, 'getElementById').mockImplementation((id) => {
     if (id === 'test-button') {
-        return mockButtonElement;
+        // @ts-expect-error mocked partially for test case only
+        return mockButtonElement as HTMLButtonElement;
     }
     return null;
 });
@@ -52,7 +52,7 @@ describe('setupSerialConnection', () => {
         expect(instance).toBeDefined();
         expect(instance.getPort()).toBeNull();
         expect(instance.ready()).toBeFalsy();
-        // Internal configuration should have the custom baudRate
+
         expect(instance.configuration).toEqual({
             ...createDefaultConstructorObject(),
             baudRate: 115200,
@@ -75,7 +75,7 @@ describe('setupSerialConnection', () => {
             logIncomingSerialData: true,
             requestAccessOnPageLoad: true,
         });
-        // Verify that window.addEventListener was called for 'load' event
+
         expect(window.addEventListener).toHaveBeenCalledWith('load', instance.createModal);
     });
 
@@ -103,7 +103,7 @@ describe('setupSerialConnection', () => {
 });
 
 describe('Connection Instance Methods', () => {
-    let instance;
+    let instance: SerialConnection;
 
     beforeEach(() => {
         instance = setupSerialConnection();
@@ -115,14 +115,15 @@ describe('Connection Instance Methods', () => {
         expect(navigator.serial.requestPort).toHaveBeenCalledWith({ filters: [] });
         expect(instance.getPort()).toBeDefined();
         console.log('instance', instance);
-        expect(instance.getPort().open).toHaveBeenCalledWith({ baudRate: 57600 });
+        expect(instance.getPort()!.open).toHaveBeenCalledWith({ baudRate: 57600 });
         expect(instance.ready()).toBeTruthy();
     });
 
     it('should send data when send is called', async () => {
         await instance.startConnection();
-        // Mock writer.write
+
         const mockWrite = vi.fn();
+        // @ts-expect-error - used only for test case, partial writer is enough
         instance.setWriter({
             write: mockWrite,
         });
@@ -135,6 +136,7 @@ describe('Connection Instance Methods', () => {
         await instance.startConnection();
         instance.configuration.parseStringsAsNumbers = true;
         const mockWrite = vi.fn();
+        // @ts-expect-error - used only for test case, partial writer is enough
         instance.setWriter({
             write: mockWrite,
         });
@@ -147,6 +149,7 @@ describe('Connection Instance Methods', () => {
         await instance.startConnection();
         instance.configuration.parseStringsAsNumbers = false;
         const mockWrite = vi.fn();
+        // @ts-expect-error - used only for test case, partial writer is enough
         instance.setWriter({
             write: mockWrite,
         });
