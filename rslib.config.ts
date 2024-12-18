@@ -20,6 +20,9 @@ export default defineConfig({
         {
             format: 'esm',
             syntax,
+            dts: {
+                bundle: true,
+            },
             output: {
                 filename: {
                     js: '[name].esm.mjs',

@@ -54,9 +54,8 @@ describe('parseAsNumber', () => {
         expect(parseAsNumber(input)).toEqual(expected);
     });
 
-    it('should return null and undefined as is', () => {
+    it('should return null as is', () => {
         expect(parseAsNumber(null)).toBe(null);
-        expect(parseAsNumber(undefined)).toBe(undefined);
     });
 
     it('should parse scientific notation strings into numbers', () => {

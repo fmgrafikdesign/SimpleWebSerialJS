@@ -1,3 +1,9 @@
+# 1.3.0
+
+- feat: Rewrite library in Typescript
+- feat: Add declaration file generation to build process
+- chore: Delete unused folder
+
 # 1.2.0
 
 - Switch to rslib for bundling the library

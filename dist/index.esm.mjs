@@ -1,29 +1,40 @@
+function _define_property(obj, key, value) {
+    if (key in obj) Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+    });
+    else obj[key] = value;
+    return obj;
+}
 const DEFAULT_BAUDRATE = 57600;
 class LineBreakTransformer {
     transform(chunk, controller) {
         try {
             this.chunks += chunk;
             const lines = this.chunks.split('\r\n');
-            this.chunks = lines.pop();
-            lines.forEach((line)=>controller.enqueue(line));
+            this.chunks = lines.pop() || '';
+            for (const line of lines)controller.enqueue(line);
         } catch (error) {
             console.error(`Transformation Error: ${error}`);
         }
     }
     flush(controller) {
         try {
-            controller.enqueue(this.chunks);
+            if (this.chunks) controller.enqueue(this.chunks);
         } catch (error) {
             console.error(`Flushing Error: ${error}`);
         }
     }
     constructor(){
+        _define_property(this, "chunks", void 0);
         this.chunks = '';
     }
 }
 function parseAsNumber(value) {
     if ('number' == typeof value) return value;
-    if ('string' == typeof value && !isNaN(value) && '' !== value.trim()) return parseFloat(value);
+    if ('string' == typeof value && !Number.isNaN(+value) && '' !== value.trim()) return parseFloat(value);
     if (Array.isArray(value)) return value.map((item)=>parseAsNumber(item));
     if ('object' == typeof value && null !== value) return Object.keys(value).reduce((acc, key)=>{
         acc[key] = parseAsNumber(value[key]);
@@ -48,21 +59,16 @@ function createDefaultConstructorObject() {
         filters: []
     };
 }
-function createConnectionInstance(configuration) {
-    let port = null;
-    let writer = null;
-    let modalElement = null;
-    let modalErrorElement = null;
-    let _listeners = {};
-    function requestSerialAccessOnClick(element) {
+class SerialConnection {
+    requestSerialAccessOnClick(element) {
         if ('string' == typeof element) {
             const el = document.getElementById(element);
-            if (!el) throw new Error('Could not find element with ID \'' + element + '\'.');
+            if (!el) throw new Error(`Could not find element with ID '${element}'.`);
             element = el;
         }
-        element.addEventListener('click', startConnection);
+        element.addEventListener('click', this.startConnection);
     }
-    function createModal() {
+    createModal() {
         const [modal, modalOverlay, modalContainer, modalInner, modalInnerText, modalErrorText, modalInnerButton] = [
             'div',
             'div',
@@ -75,120 +81,128 @@ function createConnectionInstance(configuration) {
         modalContainer.classList.add('SimpleWebSerial-modal-container');
         modalOverlay.classList.add('SimpleWebSerial-modal-overlay');
         modalInner.classList.add('SimpleWebSerial-modal-inner');
-        if (configuration.styleDomElements) {
-            modal.setAttribute('style', 'position: fixed; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; z-index: 10000');
-            modalOverlay.setAttribute('style', 'background-color: rgba(0,0,0,.3); position: absolute; left: 0; top: 0; width: 100%; height: 100%; left: 0; top: 0; cursor: pointer');
+        if (this.configuration.styleDomElements) {
+            modal.setAttribute('style', 'position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 10000');
+            modalOverlay.setAttribute('style', 'background-color: rgba(0,0,0,.3); position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer');
             modalContainer.setAttribute('style', 'position: absolute; width: 100%; height: auto; padding: 4rem; box-sizing: border-box;');
             modalInner.setAttribute('style', 'background-color: #fff; border-radius: 4px; padding: 1rem; box-shadow: 0px 2px 11px 4px rgba(0,0,0, .09);');
             modalInnerText.setAttribute('style', 'color: #000');
             modalErrorText.setAttribute('style', 'color: #dd0000');
         }
-        modalInnerText.innerText = configuration.accessText;
-        modalInnerButton.innerText = configuration.accessButtonLabel;
-        requestSerialAccessOnClick(modalInnerButton);
+        modalInnerText.innerText = this.configuration.accessText;
+        modalInnerButton.innerText = this.configuration.accessButtonLabel;
+        this.requestSerialAccessOnClick(modalInnerButton);
         modalInner.append(modalInnerText, modalErrorText, modalInnerButton);
         modalContainer.append(modalInner);
         modal.append(modalOverlay, modalContainer);
-        modalElement = modal;
-        modalErrorElement = modalErrorText;
+        this._modalElement = modal;
+        this._modalErrorElement = modalErrorText;
         document.body.append(modal);
-        return modal;
     }
-    function showErrorMessageInModal(message) {
-        if (!modalErrorElement) return;
-        modalErrorElement.innerHTML = message;
+    showErrorMessageInModal(message) {
+        if (!this._modalErrorElement) return;
+        this._modalErrorElement.innerHTML = message;
     }
-    function removeModal() {
-        null == modalElement || modalElement.remove();
+    removeModal() {
+        var _this__modalElement;
+        null === (_this__modalElement = this._modalElement) || void 0 === _this__modalElement || _this__modalElement.remove();
     }
-    async function startConnection() {
-        if (ready()) throw new Error('Serial connection has already been established.');
+    async startConnection() {
+        if (this.ready()) throw new Error('Serial connection has already been established.');
         try {
-            port = await navigator.serial.requestPort({
-                filters: configuration.filters
+            this.port = await navigator.serial.requestPort({
+                filters: this.configuration.filters
             });
-            await port.open({
-                baudRate: configuration.baudRate
+            await this.port.open({
+                baudRate: this.configuration.baudRate
             });
         } catch (e) {
-            showErrorMessageInModal("There was an error trying to open a serial connection. Please make sure the port is not occupied in another tab or process. Error message:<br>" + e);
-            throw new Error(e);
+            this.showErrorMessageInModal("There was an error trying to open a serial connection. Please make sure the port is not occupied in another tab or process. Error message:<br>" + e);
+            throw e;
         }
-        if (configuration.requestAccessOnPageLoad) removeModal();
+        if (this.configuration.requestAccessOnPageLoad) this.removeModal();
         const textEncoder = new TextEncoderStream();
-        writer = textEncoder.writable.getWriter();
+        this.writer = textEncoder.writable.getWriter();
         const decoder = new TextDecoderStream();
-        textEncoder.readable.pipeTo(port.writable);
-        port.readable.pipeTo(decoder.writable);
+        textEncoder.readable.pipeTo(this.port.writable);
+        this.port.readable.pipeTo(decoder.writable);
         const inputStream = decoder.readable;
-        const reader = inputStream.pipeThrough(new TransformStream(configuration.transformer)).getReader();
-        readLoop(reader).then((response)=>{
-            console.log(response, 'readLoop done');
-        }).catch((e)=>{
-            console.error('Could not read serial data. Please make sure the same baud rate is used on device (Serial.begin()) and library. Library currently uses baud rate', configuration.baudRate, 'Please also make sure you\'re not sending too much serial data. Consider using (a higher) delay() to throttle the amount of data sent.');
+        const reader = inputStream.pipeThrough(new TransformStream(this.configuration.transformer)).getReader();
+        this.readLoop(reader).catch((e)=>{
+            console.error('Could not read serial data. Please make sure the same baud rate is used on device (Serial.begin()) and library. Library currently uses baud rate', this.configuration.baudRate, "Please also make sure you're not sending too much serial data. Consider using (a higher) delay() to throttle the amount of data sent.");
             console.error(e);
         });
     }
-    function on(name, callback) {
-        if (!_listeners[name]) _listeners[name] = [];
-        _listeners[name].push(callback);
+    on(name, callback) {
+        if (!this._listeners[name]) this._listeners[name] = [];
+        this._listeners[name].push(callback);
         return [
             name,
             callback
         ];
     }
-    function removeListener(name, callbackToRemove) {
-        if ('object' == typeof name && void 0 === callbackToRemove) {
-            callbackToRemove = name[1];
-            name = name[0];
-        }
-        if (!_listeners[name]) throw new Error('There is no listener named ' + name + '.');
-        const length = _listeners[name].length;
-        _listeners[name] = _listeners[name].filter((listener)=>listener !== callbackToRemove);
-        return length !== _listeners[name].length;
+    removeListener(nameOrListener, callbackToRemove) {
+        let name;
+        if (Array.isArray(nameOrListener) && void 0 === callbackToRemove) [name, callbackToRemove] = nameOrListener;
+        else if ('string' == typeof nameOrListener && void 0 !== callbackToRemove) name = nameOrListener;
+        else throw new Error('Invalid arguments for removeListener.');
+        if (!this._listeners[name]) throw new Error('There is no listener named ' + name + '.');
+        const length = this._listeners[name].length;
+        this._listeners[name] = this._listeners[name].filter((listener)=>listener !== callbackToRemove);
+        return length !== this._listeners[name].length;
     }
-    function removeListeners(name) {
+    removeListeners(name) {
+        var _this__listeners_name;
         if ('string' != typeof name) throw new Error('removeListeners expects a string as parameter, which will be used to remove all listeners of that event.');
-        const length = _listeners[name].length;
-        _listeners[name] = [];
+        const length = (null === (_this__listeners_name = this._listeners[name]) || void 0 === _this__listeners_name ? void 0 : _this__listeners_name.length) || 0;
+        this._listeners[name] = [];
         return length > 0;
     }
-    function ready() {
-        return (null == port ? void 0 : port.readable) && (null == port ? void 0 : port.writable);
+    ready() {
+        var _this_port, _this_port1;
+        return !!((null === (_this_port = this.port) || void 0 === _this_port ? void 0 : _this_port.readable) && (null === (_this_port1 = this.port) || void 0 === _this_port1 ? void 0 : _this_port1.writable));
     }
-    function writable() {
-        return null == port ? void 0 : port.writable;
+    readable() {
+        var _this_port;
+        return (null === (_this_port = this.port) || void 0 === _this_port ? void 0 : _this_port.readable) || null;
     }
-    function readable() {
-        return null == port ? void 0 : port.readable;
+    writable() {
+        var _this_port;
+        return (null === (_this_port = this.port) || void 0 === _this_port ? void 0 : _this_port.writable) || null;
     }
-    async function send(name, data) {
-        if (!(null == port ? void 0 : port.writable)) return;
+    async send(name, data) {
+        var _this_port;
+        if (!(null === (_this_port = this.port) || void 0 === _this_port ? void 0 : _this_port.writable) || !this.writer) return;
+        let messageToSend;
         if (void 0 === data) {
-            if (configuration.logOutgoingSerialData) console.log(name);
-            if (configuration.parseStringsAsNumbers) name = parseAsNumber(name);
-            return sendData(name);
+            if (this.configuration.logOutgoingSerialData) console.log(name);
+            if (this.configuration.parseStringsAsNumbers) name = parseAsNumber(name);
+            messageToSend = [
+                '_d',
+                name
+            ];
+        } else {
+            if (this.configuration.parseStringsAsNumbers) data = parseAsNumber(data);
+            messageToSend = [
+                name,
+                data
+            ];
         }
-        if (configuration.parseStringsAsNumbers) data = parseAsNumber(data);
-        const event = [
-            name,
-            data
-        ];
-        const stringified = JSON.stringify(event);
-        if (configuration.logOutgoingSerialData) console.log(stringified);
-        return writer.write(stringified + configuration.newLineCharacter);
+        const stringified = JSON.stringify(messageToSend);
+        if (this.configuration.logOutgoingSerialData) console.log(stringified);
+        await this.writer.write(stringified + this.configuration.newLineCharacter);
     }
-    async function sendEvent(name) {
-        return send('_e', name);
+    async sendEvent(name) {
+        await this.send('_e', name);
     }
-    async function sendData(data) {
-        return send('_d', data);
+    async sendData(data) {
+        await this.send('_d', data);
     }
-    function emit(name, data) {
-        if (_listeners[name]) _listeners[name].forEach((callback)=>callback(data));
-        else if (configuration.warnAboutUnregisteredEvents) return console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
+    emit(name, data) {
+        if (this._listeners[name]) this._listeners[name].forEach((callback)=>callback(data));
+        else if (this.configuration.warnAboutUnregisteredEvents) console.warn('Event ' + name + ' has been received, but it has never been registered as listener.');
     }
-    async function readLoop(reader) {
+    async readLoop(reader) {
         while(true){
             const { value, done } = await reader.read();
             if (value) {
@@ -197,27 +211,26 @@ function createConnectionInstance(configuration) {
                     json = JSON.parse(value);
                 } catch  {}
                 if (json) {
-                    if (configuration.logIncomingSerialData) console.log(json);
-                    if ('object' == typeof json) {
-                        if ('_w' === json[0]) {
+                    if (this.configuration.logIncomingSerialData) console.log(json);
+                    if (Array.isArray(json)) switch(json[0]){
+                        case '_w':
                             console.warn('[ARDUINO] ' + json[1]);
                             continue;
-                        }
-                        if ('_l' === json[0]) {
+                        case '_l':
                             console.log('[ARDUINO] ' + json[1]);
                             continue;
-                        }
-                        if ('_e' === json[0]) {
+                        case '_e':
                             console.error('[ARDUINO] ' + json[1]);
                             continue;
-                        }
-                        if ('_d' === json[0]) {
-                            emit('data', json[1]);
+                        case '_d':
+                            this.emit('data', json[1]);
                             continue;
-                        }
-                        emit(json[0], json[1]);
-                    } else if ('string' == typeof json) emit(json, null);
-                } else if (configuration.logIncomingSerialData) console.log(value);
+                        default:
+                            this.emit(json[0], json[1]);
+                            continue;
+                    }
+                    else if ('string' == typeof json) this.emit(json, null);
+                } else if (this.configuration.logIncomingSerialData) console.log(value);
             }
             if (done) {
                 console.log('[readLoop] DONE', done);
@@ -226,57 +239,51 @@ function createConnectionInstance(configuration) {
             }
         }
     }
-    function getPort() {
-        return port;
+    getPort() {
+        return this.port;
     }
-    function getWriter() {
-        return writer;
+    getWriter() {
+        return this.writer;
     }
-    function setWriter(newWriter) {
-        writer = newWriter;
-        return writer;
+    setWriter(newWriter) {
+        this.writer = newWriter;
+        return this.writer;
     }
-    return {
-        configuration,
-        createModal,
-        emit,
-        modalElement,
-        on,
-        getPort,
-        ready,
-        readable,
-        removeListener,
-        removeListeners,
-        requestSerialAccessOnClick,
-        send,
-        sendData,
-        sendEvent,
-        startConnection,
-        writable,
-        writer,
-        getWriter,
-        setWriter
-    };
+    get modalElement() {
+        return this._modalElement;
+    }
+    constructor(configuration){
+        _define_property(this, "port", null);
+        _define_property(this, "writer", null);
+        _define_property(this, "_modalElement", null);
+        _define_property(this, "_modalErrorElement", null);
+        _define_property(this, "_listeners", {});
+        _define_property(this, "configuration", void 0);
+        this.configuration = configuration;
+        this.startConnection = this.startConnection.bind(this);
+        this.createModal = this.createModal.bind(this);
+    }
 }
-const setupSerialConnection = function(args) {
-    if (!navigator.serial) throw new Error('The Serial API not supported in your browser. Make sure you\'ve enabled flags if necessary!');
-    if ('number' == typeof args) args = {
+function setupSerialConnection(args) {
+    if (!navigator.serial) throw new Error("The Serial API is not supported in your browser. Make sure you've enabled flags if necessary!");
+    let configuration;
+    if ('number' == typeof args) configuration = {
         ...createDefaultConstructorObject(),
         baudRate: args
     };
-    else if (void 0 === args) args = createDefaultConstructorObject();
-    else if ('object' == typeof args) args = {
+    else if (void 0 === args) configuration = createDefaultConstructorObject();
+    else if ('object' == typeof args) configuration = {
         ...createDefaultConstructorObject(),
         ...args
     };
-    if (null != args.requestElement) args = {
-        ...args,
+    else throw new Error('Invalid arguments for setupSerialConnection.');
+    if (null != configuration.requestElement) configuration = {
+        ...configuration,
         requestAccessOnPageLoad: false
     };
-    const configuration = args;
-    const instance = createConnectionInstance(configuration);
+    const instance = new SerialConnection(configuration);
     if (configuration.requestElement) instance.requestSerialAccessOnClick(configuration.requestElement);
     if (configuration.requestAccessOnPageLoad) window.addEventListener('load', instance.createModal);
     return instance;
-};
+}
 export { setupSerialConnection };
