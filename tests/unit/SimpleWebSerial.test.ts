@@ -111,10 +111,8 @@ describe('Connection Instance Methods', () => {
 
     it('should start connection when startConnection is called', async () => {
         await instance.startConnection();
-        console.log(instance.getPort());
         expect(navigator.serial.requestPort).toHaveBeenCalledWith({ filters: [] });
         expect(instance.getPort()).toBeDefined();
-        console.log('instance', instance);
         expect(instance.getPort()!.open).toHaveBeenCalledWith({ baudRate: 57600 });
         expect(instance.ready()).toBeTruthy();
     });

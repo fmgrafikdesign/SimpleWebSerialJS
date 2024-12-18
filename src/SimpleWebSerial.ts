@@ -50,7 +50,7 @@ class LineBreakTransformer implements Transformer<string, string> {
                 controller.enqueue(line);
             }
         } catch (error) {
-            console.error(`Transformation Error: ${error}`);
+            console.error(`Transformation Error: ${error} @chunk: ${chunk}`);
         }
     }
 

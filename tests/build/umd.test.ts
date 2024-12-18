@@ -19,7 +19,6 @@ test('UMD: Library and its functions are available after loading it via script t
     const __dirname = dirname(__filename);
     const scriptPath = resolve(__dirname, '../../dist/simple-web-serial.min.js');
 
-    console.log('script path:', scriptPath);
     // Read and execute the script in the JSDOM environment
     const scriptContent = readFileSync(scriptPath, 'utf-8');
     const scriptEl = window.document.createElement('script');
