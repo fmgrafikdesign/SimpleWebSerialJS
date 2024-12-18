@@ -1,5 +1,6 @@
 import { test, expect } from 'vitest';
 import { JSDOM } from 'jsdom';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 
@@ -14,6 +15,8 @@ test('UMD: Library and its functions are available after loading it via script t
 
     expect(window.SimpleWebSerial).not.toBeDefined();
 
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
     const scriptPath = path.resolve(__dirname, '../../dist/simple-web-serial.min.js');
 
     console.log('script path:', scriptPath);

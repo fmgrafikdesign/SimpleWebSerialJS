@@ -97,7 +97,7 @@ describe('setupSerialConnection', () => {
         });
 
         expect(() => setupSerialConnection()).toThrow(
-            'The Serial API not supported in your browser. Make sure you\'ve enabled flags if necessary!'
+            'The Serial API is not supported in your browser. Make sure you\'ve enabled flags if necessary!'
         );
     });
 });
