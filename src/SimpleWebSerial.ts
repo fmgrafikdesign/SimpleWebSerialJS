@@ -1,6 +1,7 @@
+/** Default baudrate (57600) for serial communication. Common for many Arduino boards. */
 export const DEFAULT_BAUDRATE = 57600;
 
-interface ConnectionConfiguration {
+export interface ConnectionConfiguration {
     baudRate: number;
     requestElement: HTMLElement | string | null;
     requestAccessOnPageLoad: boolean;
@@ -16,7 +17,7 @@ interface ConnectionConfiguration {
     filters: SerialPortFilter[];
 }
 
-type JsonValue =
+export type JsonValue =
     | string
     | number
     | boolean
@@ -24,27 +25,29 @@ type JsonValue =
     | JsonObject
     | JsonArray;
 
-interface JsonObject {
+export interface JsonObject {
     [key: string]: JsonValue;
 }
 
-type JsonArray = Array<JsonValue>;
+export type JsonArray = Array<JsonValue>;
 
-type ListenerCallback = (data: JsonValue) => void;
-type Listener = [string, ListenerCallback];
-type Listeners = Record<string, ListenerCallback[]>;
+export type ListenerCallback = (data: JsonValue) => void;
+export type Listener = [string, ListenerCallback];
+export type Listeners = Record<string, ListenerCallback[]>;
 
-class LineBreakTransformer implements Transformer<string, string> {
+export class LineBreakTransformer implements Transformer<string, string> {
     private chunks: string;
+    private delimiter: string;
 
-    constructor() {
+    constructor(delimiter: string = '\r\n') {
         this.chunks = '';
+        this.delimiter = delimiter;
     }
 
     transform(chunk: string, controller: TransformStreamDefaultController<string>): void {
         try {
             this.chunks += chunk;
-            const lines = this.chunks.split('\r\n');
+            const lines = this.chunks.split(this.delimiter);
             this.chunks = lines.pop() || '';
             for (const line of lines) {
                 controller.enqueue(line);
@@ -66,15 +69,16 @@ class LineBreakTransformer implements Transformer<string, string> {
 }
 
 // Function to parse values as numbers if possible
-export function parseAsNumber(value: JsonValue): JsonValue {
+export function parseNumbersRecursively(value: JsonValue): JsonValue {
     if (typeof value === 'number') return value;
     if (typeof value === 'string' && !Number.isNaN(+value) && value.trim() !== '') return parseFloat(value);
-    if (Array.isArray(value)) return value.map(item => parseAsNumber(item));
+    if (Array.isArray(value)) return value.map(item => parseNumbersRecursively(item));
     if (typeof value === 'object' && value !== null) {
-        return Object.keys(value).reduce((acc: { [key: string]: JsonValue }, key) => {
-            acc[key] = parseAsNumber(value[key]);
-            return acc;
-        }, {});
+        const result: { [key: string]: JsonValue } = {};
+        for (const key in value) {
+            result[key] = parseNumbersRecursively(value[key]);
+        }
+        return result;
     }
     return value;
 }
@@ -277,12 +281,12 @@ export class SerialConnection {
                 console.log(name);
             }
             if (this.configuration.parseStringsAsNumbers) {
-                name = parseAsNumber(name) as string;
+                name = parseNumbersRecursively(name) as string;
             }
             messageToSend = ['_d', name];
         } else {
             if (this.configuration.parseStringsAsNumbers) {
-                data = parseAsNumber(data);
+                data = parseNumbersRecursively(data);
             }
             messageToSend = [name, data];
         }
@@ -318,8 +322,10 @@ export class SerialConnection {
                 let json: JsonValue = null;
                 try {
                     json = JSON.parse(value);
-                } catch {
-                    // Ignore bad reads
+                } catch (error) {
+                    if (this.configuration.logIncomingSerialData) {
+                        console.warn('Failed to parse serial data:', value, '| Reported error:', error);
+                    }
                 }
                 if (json) {
                     if (this.configuration.logIncomingSerialData) {

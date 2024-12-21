@@ -13,11 +13,11 @@ class LineBreakTransformer {
     transform(chunk, controller) {
         try {
             this.chunks += chunk;
-            const lines = this.chunks.split('\r\n');
+            const lines = this.chunks.split(this.delimiter);
             this.chunks = lines.pop() || '';
             for (const line of lines)controller.enqueue(line);
         } catch (error) {
-            console.error(`Transformation Error: ${error}`);
+            console.error(`Transformation Error: ${error} @chunk: ${chunk}`);
         }
     }
     flush(controller) {
@@ -27,19 +27,22 @@ class LineBreakTransformer {
             console.error(`Flushing Error: ${error}`);
         }
     }
-    constructor(){
+    constructor(delimiter = '\r\n'){
         _define_property(this, "chunks", void 0);
+        _define_property(this, "delimiter", void 0);
         this.chunks = '';
+        this.delimiter = delimiter;
     }
 }
-function parseAsNumber(value) {
+function parseNumbersRecursively(value) {
     if ('number' == typeof value) return value;
     if ('string' == typeof value && !Number.isNaN(+value) && '' !== value.trim()) return parseFloat(value);
-    if (Array.isArray(value)) return value.map((item)=>parseAsNumber(item));
-    if ('object' == typeof value && null !== value) return Object.keys(value).reduce((acc, key)=>{
-        acc[key] = parseAsNumber(value[key]);
-        return acc;
-    }, {});
+    if (Array.isArray(value)) return value.map((item)=>parseNumbersRecursively(item));
+    if ('object' == typeof value && null !== value) {
+        const result = {};
+        for(const key in value)result[key] = parseNumbersRecursively(value[key]);
+        return result;
+    }
     return value;
 }
 function createDefaultConstructorObject() {
@@ -176,13 +179,13 @@ class SerialConnection {
         let messageToSend;
         if (void 0 === data) {
             if (this.configuration.logOutgoingSerialData) console.log(name);
-            if (this.configuration.parseStringsAsNumbers) name = parseAsNumber(name);
+            if (this.configuration.parseStringsAsNumbers) name = parseNumbersRecursively(name);
             messageToSend = [
                 '_d',
                 name
             ];
         } else {
-            if (this.configuration.parseStringsAsNumbers) data = parseAsNumber(data);
+            if (this.configuration.parseStringsAsNumbers) data = parseNumbersRecursively(data);
             messageToSend = [
                 name,
                 data
@@ -209,7 +212,9 @@ class SerialConnection {
                 let json = null;
                 try {
                     json = JSON.parse(value);
-                } catch  {}
+                } catch (error) {
+                    if (this.configuration.logIncomingSerialData) console.warn('Failed to parse serial data:', value, '| Reported error:', error);
+                }
                 if (json) {
                     if (this.configuration.logIncomingSerialData) console.log(json);
                     if (Array.isArray(json)) switch(json[0]){
@@ -286,4 +291,4 @@ function setupSerialConnection(args) {
     if (configuration.requestAccessOnPageLoad) window.addEventListener('load', instance.createModal);
     return instance;
 }
-export { setupSerialConnection };
+export { DEFAULT_BAUDRATE, LineBreakTransformer, setupSerialConnection };

@@ -1,4 +1,4 @@
-declare interface ConnectionConfiguration {
+export declare interface ConnectionConfiguration {
     baudRate: number;
     requestElement: HTMLElement | string | null;
     requestAccessOnPageLoad: boolean;
@@ -14,19 +14,32 @@ declare interface ConnectionConfiguration {
     filters: SerialPortFilter[];
 }
 
-declare type JsonArray = Array<JsonValue>;
+/** Default baudrate (57600) for serial communication. Common for many Arduino boards. */
+export declare const DEFAULT_BAUDRATE = 57600;
 
-declare interface JsonObject {
+export declare type JsonArray = Array<JsonValue>;
+
+export declare interface JsonObject {
     [key: string]: JsonValue;
 }
 
-declare type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export declare type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
 
-declare type Listener = [string, ListenerCallback];
+export declare class LineBreakTransformer implements Transformer<string, string> {
+    private chunks;
+    private delimiter;
+    constructor(delimiter?: string);
+    transform(chunk: string, controller: TransformStreamDefaultController<string>): void;
+    flush(controller: TransformStreamDefaultController<string>): void;
+}
 
-declare type ListenerCallback = (data: JsonValue) => void;
+export declare type Listener = [string, ListenerCallback];
 
-declare class SerialConnection {
+export declare type ListenerCallback = (data: JsonValue) => void;
+
+export declare type Listeners = Record<string, ListenerCallback[]>;
+
+export declare class SerialConnection {
     private port;
     private writer;
     private _modalElement;
