@@ -1,3 +1,16 @@
+# 1.4.1
+
+- fix: Add web serial api types to dependencies
+- fix: Make SerialConnection readable + writable types more generic
+
+# 1.4.0
+
+- feat: Add other library types as type exports so users can explicitly type their code
+- feat: Add possibility to use custom delimiters for line break transformer
+- feat: Log erroneous data in readLoop if logIncomingSerialData option is set
+- dev: Rename and refactor parseAsNumber functionality to parseNumbersRecursively
+- dev: Add unit tests for line break transformer class
+
 # 1.3.1
 
 - fix: Add examples folder back to distributed files
