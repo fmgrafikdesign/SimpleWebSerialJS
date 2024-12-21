@@ -1,6 +1,6 @@
 {
   "name": "simple-web-serial",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Connect an Arduino with your web application, in seconds. Use an event-driven approach and take advantage of a pre-configured web serial api setup routine.",
   "keywords": [
     "serial port",
@@ -43,11 +43,13 @@
     "url": "https://github.com/fmgrafikdesign/SimpleWebSerialJS/issues"
   },
   "homepage": "https://github.com/fmgrafikdesign/SimpleWebSerialJS#readme",
+  "dependencies": {
+    "@types/w3c-web-serial": "^1.0.7"
+  },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@microsoft/api-extractor": "^7.48.1",
     "@rslib/core": "^0.1.4",
-    "@types/w3c-web-serial": "^1.0.7",
     "eslint": "^9.17.0",
     "globals": "^15.13.0",
     "husky": "^9.1.7",

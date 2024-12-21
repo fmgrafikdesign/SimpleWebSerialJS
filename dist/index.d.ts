@@ -56,8 +56,8 @@ export declare class SerialConnection {
     removeListener(nameOrListener: string | Listener, callbackToRemove?: ListenerCallback): boolean;
     removeListeners(name: string): boolean;
     ready(): boolean;
-    readable(): ReadableStream<Uint8Array<ArrayBufferLike>> | null;
-    writable(): WritableStream<Uint8Array<ArrayBufferLike>> | null;
+    readable(): ReadableStream<Uint8Array> | null;
+    writable(): WritableStream<Uint8Array> | null;
     send(name: string, data?: JsonValue): Promise<void>;
     sendEvent(name: string): Promise<void>;
     sendData(data: JsonValue): Promise<void>;
