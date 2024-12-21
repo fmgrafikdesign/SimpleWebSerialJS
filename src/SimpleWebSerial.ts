@@ -264,11 +264,11 @@ export class SerialConnection {
         return !!(this.port?.readable && this.port?.writable);
     }
 
-    public readable(): ReadableStream<Uint8Array<ArrayBufferLike>> | null {
+    public readable(): ReadableStream<Uint8Array> | null {
         return this.port?.readable || null;
     }
 
-    public writable(): WritableStream<Uint8Array<ArrayBufferLike>> | null {
+    public writable(): WritableStream<Uint8Array> | null {
         return this.port?.writable || null;
     }
 
