@@ -58,7 +58,7 @@ void setup() {
 void eventCallback(JSONVar data) {
     // Do something, even sending events right back!
     WebSerial.send("event-from-arduino", data);
-});
+};
 
 void loop() {
   // Check for new serial data every loop
